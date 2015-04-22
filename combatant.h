@@ -7,18 +7,28 @@
 #include <QString>
 
 
+class D10
+{
+public:
+    static int roll(int dieCount, bool dblSuccess = true, int dblThreshold = 10 );
+
+};
+
 class WoundType: public QObject
 {
     Q_OBJECT
-    Q_ENUMS(damage)
+    Q_ENUMS(Wounds)
 public:
-    enum damage{Bashing = 1, Lethal, Aggravated};
+    enum Wounds{Bashing = 1, Lethal, Aggravated};
 };
+
 class Weapon:public QObject
 {
+        Q_OBJECT
 public:
-    Weapon();
-    ~Weapon();
+    explicit Weapon(QObject *parent = 0);
+    Weapon(int acc, int dmg, int def, QString abi, bool useStr,int type = WoundType::Bashing, int over = 0, QObject* parent = 0);
+
     int accuracy() const;
     void setAccuracy(int value);
 
@@ -44,11 +54,11 @@ private:
     QString myName;
     int myAccuracy;
     int myDamage;
-    int myWoundType;
     int myDefense;
-    int myOverwhelming;
     QString myAbility;
-    bool usesStrength;
+    bool myStrength;
+    int myWoundType;
+    int myOverwhelming;
 };
 
 
@@ -57,14 +67,21 @@ class Combatant:public QObject
 {
     Q_OBJECT
     Q_ENUMS(AttackType)
+    Q_ENUMS(DefenseType)
 public:
-    Combatant();
-    ~Combatant();
+    explicit Combatant(QObject *parent = 0);
+    Combatant(QString name, int eva, int par, int join, int dex, int str, int nSoak, int aSoak, int hard, QObject *parent = 0);
+
+    void setHealth(QList <int> HLCounts);
 
     enum AttackType{Withering, Decisive};
+    enum DefenseType{Overall,Evasion,Parry};
+
+    int joinBattle();
 
     int attack(int attackType);
     int damage(int attackType);
+    int defense(DefenseType which, bool onslaught = true);
 
     void resetInitiative();
     void changeInitiative(int value);
@@ -75,10 +92,9 @@ public:
 private:
     QString myName;
     int myInitiative;
-    QList<QList<int> > myHealthLevels;
+    QList<QList<int> >myHealthLevels;
     int myEvasion;
     int myParry;
-    int myHardness;
     int myJoinBattle;
     int myDexterity;
     int myStrength;
@@ -86,7 +102,13 @@ private:
     Weapon myWeapon;
     int myNaturalSoak;
     int myArmorSoak;
-    int Hardness;
+    int myHardness;
+    int myOnslaught;
+    QPair<int,int> bashingEnd;
+    QPair<int,int> lethalEnd;
+    QPair<int,int> aggravatedEnd;
+
+    void initialize();
 };
 
 #endif // COMBATANT_H
