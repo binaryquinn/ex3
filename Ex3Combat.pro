@@ -3,7 +3,9 @@ TEMPLATE = app
 QT += qml quick widgets
 
 SOURCES += main.cpp \
-    combatant.cpp
+    combatant.cpp \
+    healthtrack.cpp \
+    combattracker.cpp
 
 RESOURCES += qml.qrc
 
@@ -14,4 +16,6 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    combatant.h
+    combatant.h \
+    healthtrack.h \
+    combattracker.h

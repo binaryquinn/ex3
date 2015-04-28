@@ -6,9 +6,10 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-//    QQmlApplicationEngine engine;
- //   engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    Combatant c;
+    QQmlApplicationEngine engine;
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
-    app.quit();
+
+    return app.exec();
+    return 0;
 }

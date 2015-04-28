@@ -2,6 +2,7 @@
 #define COMBATANT_H
 
 #include <QList>
+#include <QMap>
 #include <QObject>
 #include <QPair>
 #include <QString>
@@ -27,7 +28,7 @@ class Weapon:public QObject
         Q_OBJECT
 public:
     explicit Weapon(QObject *parent = 0);
-    Weapon(int acc, int dmg, int def, QString abi, bool useStr,int type = WoundType::Bashing, int over = 0, QObject* parent = 0);
+    Weapon(QString name, int acc, int dmg, int def, QString abi, bool useStr,int type = WoundType::Bashing, int over = 0, QObject* parent = 0);
 
     int accuracy() const;
     void setAccuracy(int value);
@@ -50,6 +51,9 @@ public:
     int overwhelming() const;
     void setOverwhelming(int value);
 
+    QString name() const;
+    void setName(const QString &value);
+
 private:
     QString myName;
     int myAccuracy;
@@ -70,7 +74,7 @@ class Combatant:public QObject
     Q_ENUMS(DefenseType)
 public:
     explicit Combatant(QObject *parent = 0);
-    Combatant(QString name, int eva, int par, int join, int dex, int str, int nSoak, int aSoak, int hard, QObject *parent = 0);
+    Combatant(QString name, int eva, int join, int dex, int str, int nSoak, int aSoak, int hard, QObject *parent = 0);
 
     void setHealth(QList <int> HLCounts);
 
@@ -79,27 +83,28 @@ public:
 
     int joinBattle();
 
-    int attack(int attackType);
-    int damage(int attackType);
-    int defense(DefenseType which, bool onslaught = true);
-
+    int attack(int attackType, Weapon *selectedWeapon);
+    int damage(int attackType, Weapon *selectedWeapon);
+    int defense(int defenseType, Weapon *weapon, bool onslaught = true);
+    void refreshTurn();
     void resetInitiative();
     void changeInitiative(int value);
     int initiative();
-
     int takeDamage(int attackType, int damage, int overwhelming, int damageType);
+
+    Weapon *weapon(int selected);
 
 private:
     QString myName;
     int myInitiative;
     QList<QList<int> >myHealthLevels;
     int myEvasion;
-    int myParry;
     int myJoinBattle;
     int myDexterity;
     int myStrength;
-    QPair<QString,int> myCombatAbility;
-    Weapon myWeapon;
+    QMap<QString,int> myCombatAbilities;
+    QList<Weapon *> myPanoply;
+    QList<Weapon *> equippedWeapons;
     int myNaturalSoak;
     int myArmorSoak;
     int myHardness;
@@ -108,7 +113,11 @@ private:
     QPair<int,int> lethalEnd;
     QPair<int,int> aggravatedEnd;
 
+
+    int myCrashCounter;
     void initialize();
+    int parryDefense(Weapon *weapon);
+
 };
 
 #endif // COMBATANT_H

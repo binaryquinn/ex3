@@ -1,13 +1,13 @@
 #include "combatant.h"
 
 
-Combatant::Combatant(QObject *parent):QObject(parent), myName(""), myEvasion(0), myParry(0), myJoinBattle(0), myDexterity(0), myStrength(0), myNaturalSoak(0), myArmorSoak(0),myHardness(0)
+Combatant::Combatant(QObject *parent):QObject(parent), myName(""), myEvasion(0), myJoinBattle(0), myDexterity(0), myStrength(0), myNaturalSoak(0), myArmorSoak(0),myHardness(0)
 {
     initialize();
 }
 
-Combatant::Combatant(QString name, int eva, int par, int join, int dex, int str, int nSoak, int aSoak, int hard, QObject *parent):
-    QObject(parent), myName(name), myEvasion(eva), myParry(par), myJoinBattle(join), myDexterity(dex), myStrength(str), myNaturalSoak(nSoak), myArmorSoak(aSoak),myHardness(hard)
+Combatant::Combatant(QString name, int eva,  int join, int dex, int str, int nSoak, int aSoak, int hard, QObject *parent):
+    QObject(parent), myName(name), myEvasion(eva), myJoinBattle(join), myDexterity(dex), myStrength(str), myNaturalSoak(nSoak), myArmorSoak(aSoak),myHardness(hard)
 {
     initialize();
 }
@@ -35,34 +35,48 @@ int Combatant::joinBattle()
     return myInitiative;
 }
 
-int Combatant::attack(int attackType)
+int Combatant::attack(int attackType, Weapon * selectedWeapon)
 {
     if(attackType == Withering)
-        return D10::roll(myDexterity + myCombatAbility.second + myWeapon.accuracy());
-    return D10::roll(myDexterity + myCombatAbility.second);
+        return D10::roll(myDexterity + myCombatAbilities[selectedWeapon->ability()] + selectedWeapon->accuracy());
+    return D10::roll(myDexterity + myCombatAbilities[selectedWeapon->ability()]);
 }
 
 
-int Combatant::damage(int attackType)
+int Combatant::damage(int attackType, Weapon *selectedWeapon)
 {
     if(attackType == Withering)
-        return myStrength + myWeapon.damage();
+        return myStrength + selectedWeapon->damage();
     return myInitiative;
 }
 
-int Combatant::defense(DefenseType which, bool onslaught)
+int Combatant::defense(int defenseType, Weapon *weapon, bool onslaught)
 {
     int value;
-    switch(which)
+    int parryDef =  parryDefense(weapon);
+    switch(defenseType)
     {
-        case Overall: value = (myEvasion > myParry)? myEvasion:myParry;break;
-        case Evasion: value = myEvasion;break;
-        case Parry: value = myParry;break;
+        case Overall: value = (myEvasion > parryDef) ? myEvasion : parryDef; break;
+        case Evasion: value = myEvasion; break;
+        case Parry: value = parryDef; break;
     };
     value -= myOnslaught;
     if(onslaught)
         myOnslaught++;
     return value;
+}
+
+void Combatant::refreshTurn()
+{
+    myOnslaught = 0;
+    if(myCrashCounter == 3)
+        resetInitiative();
+    if(myInitiative < 1)
+        myCrashCounter++;
+    else
+        myCrashCounter = 0;
+
+
 }
 
 void Combatant::resetInitiative()
@@ -86,15 +100,16 @@ int Combatant::takeDamage(int attackType, int damage, int overwhelming, int dama
 
     if(attackType == Withering)
     {
-       int postSoak = D10::roll(damage) - (myNaturalSoak + myArmorSoak);
-       if(postSoak<overwhelming)
+       int postSoak = damage - (myNaturalSoak + myArmorSoak); //calculating dice pool
+       if(postSoak < overwhelming)
            postSoak = overwhelming;
+       postSoak = D10::roll(postSoak); //dice pool becomes dice successes
        myInitiative -= postSoak;
        return postSoak;
     }
     else
     {
-        if(myHardness < damage)
+        if( myInitiative < 1 || myHardness < damage)
         {
             int wounds = D10::roll(damage,false);
             if(damageType == WoundType::Bashing)
@@ -121,13 +136,29 @@ int Combatant::takeDamage(int attackType, int damage, int overwhelming, int dama
     return 0;
 }
 
+
+
+
+Weapon *Combatant::weapon(int selected)
+{
+    return equippedWeapons[selected];
+}
+
+
 void Combatant::initialize()
 {
+
     myOnslaught = 0;
     QList<int> defaultHealth;
     defaultHealth << 1 << 2 << 2 << 1 <<1;
-
+    setHealth(defaultHealth);
     bashingEnd = lethalEnd = aggravatedEnd = QPair<int,int> (0,0);
+}
+
+int Combatant::parryDefense(Weapon *weapon)
+{
+    int ability = myCombatAbilities.contains(weapon->ability()) ? myCombatAbilities[weapon->ability()] : 0;
+    return (myDexterity + ability)/2 + weapon->defense();
 }
 
 
@@ -139,8 +170,8 @@ Weapon::Weapon(QObject *parent):QObject(parent), myAccuracy(0), myDamage(0), myD
 
 }
 
-Weapon::Weapon(int acc, int dmg, int def, QString abi, bool useStr, int type, int over, QObject *parent):
-     QObject(parent), myAccuracy(acc), myDamage(dmg), myDefense(def), myAbility(abi), myStrength(useStr), myWoundType(type), myOverwhelming(over)
+Weapon::Weapon(QString name, int acc, int dmg, int def, QString abi, bool useStr, int type, int over, QObject *parent):
+     QObject(parent), myName(name), myAccuracy(acc), myDamage(dmg), myDefense(def), myAbility(abi), myStrength(useStr), myWoundType(type), myOverwhelming(over)
 {
 
 }
@@ -209,6 +240,16 @@ void Weapon::setOverwhelming(int value)
 {
     myOverwhelming = value;
 }
+QString Weapon::name() const
+{
+    return myName;
+}
+
+void Weapon::setName(const QString &value)
+{
+    myName = value;
+}
+
 
 
 int D10::roll(int dieCount, bool dblSuccess, int dblThreshold)
