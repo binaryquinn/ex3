@@ -1,25 +1,32 @@
 import QtQuick 2.4
+import QtQuick.Controls 1.3
+import QtQuick.Dialogs 1.2
+import QtQuick.Controls.Styles 1.2
+import Model 1.0
 
-AddCombatantDialogForm {
+Dialog{
+    id:combatantDialog
+    title:"Add a new combatant"
+    standardButtons: StandardButton.Ok|StandardButton.Cancel
 
-    function addWeapon( name, acc, atk, def, over, weaponModel)
-    {
-        acc = acc.toInt();
-        if(name.trim().length > 0)
-            weaponModel.append({"name":name,"acc":(!!acc)?acc:0, "atk":(!!atk)?atk:0, "def":(!!def)?def:0, "over":(!!over)?over:0});
+
+    AddCombatantDialogForm {
+
+        addWeaponButton.onClicked:
+        {
+            var name = newWeaponText.trim();
+
+            if(name.length > 0)
+            {
+                var acc = (newAccText !== "")? Number(newAccText) : 0;
+                var atk = (newAtkText !== "")? Number(newAtkText) : 0;
+                var def = (newDefText !== "")? Number(newDefText) : 0;
+                var over = (newOverText !== "")? Number(newOverText) : 0;
+
+                weaponsModel.append({"name":name,"acc":acc, "atk":atk, "def":def, "over":over});
+                newWeaponText = newAccText = newAtkText = newDefText = newOverText = "";
+
+            }
+        }
     }
-
-    addWeaponButton.onClicked:
-    {
-        var name = newWeaponField.text.trim();
-        var acc = (newAccField.text.length>0)?newAccField.text.valueOf():0;
-        var atk = (newAtkField.text.length>0)?newAtkField.text.valueOf():0;
-        var def = (newDefField.text.length>0)?newDefField.text.valueOf():0;
-        var over = (newOverField.text.length>0)?newOverField.text.valueOf():0;
-
-        if(name.length > 0)
-            weaponsView.model.append({"name":name,"acc":acc, "atk":(!!atk)?atk:0, "def":(!!def)?def:0, "over":(!!over)?over:0});
-
-    }
-
 }

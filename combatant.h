@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QPair>
 #include <QString>
+#include <QQmlListProperty>
 
 
 class D10
@@ -15,20 +16,46 @@ public:
 
 };
 
-class WoundType: public QObject
+Q_DECLARE_METATYPE(QStringList)
+class CombatConstants: public QObject
 {
     Q_OBJECT
     Q_ENUMS(Wounds)
+    Q_ENUMS(Attack)
+    Q_ENUMS(Defense)
+    Q_ENUMS(Range)
+    Q_ENUMS(Hands)
+    Q_PROPERTY(QStringList combatAbilities READ combatAbilities CONSTANT)
+    Q_PROPERTY(QStringList allAbilities READ allAbilities CONSTANT)
+    Q_PROPERTY(QStringList ranges READ ranges CONSTANT)
+    Q_PROPERTY(QStringList damageTypes READ damageTypes CONSTANT)
+
 public:
-    enum Wounds{Bashing = 1, Lethal, Aggravated};
+    enum Wounds{None, Bashing, Lethal, Aggravated};
+    enum Attack{Withering, Decisive};
+    enum Defense{Overall, Evasion, Parry};
+    enum Range{Close, Short, Medium, Long, Extreme};
+    enum Hands{Left, Right, Both};
+    QStringList combatAbilities();
+    QStringList allAbilities();
+    QStringList ranges();
+    QStringList damageTypes();
+
+private:
+    QStringList myAttackAbilities;
+    QStringList myOtherAbilities;
+    QStringList myRanges;
+    QStringList myDamageTypes;
 };
+
 
 class Weapon:public QObject
 {
         Q_OBJECT
 public:
     explicit Weapon(QObject *parent = 0);
-    Weapon(QString name, int acc, int dmg, int def, QString abi, bool useStr,int type = WoundType::Bashing, int over = 0, QObject* parent = 0);
+    Weapon(QString name, int acc, int dmg, int def, QString abi, bool useStr,
+           CombatConstants::Wounds type = CombatConstants::Bashing, int over = 0, CombatConstants::Range range = CombatConstants::Close, bool handed = false, QObject* parent = 0);
 
     int accuracy() const;
     void setAccuracy(int value);
@@ -45,14 +72,20 @@ public:
     bool usesStrength() const;
     void setUsesStrength(bool value);
 
-    int woundType() const;
-    void setWoundType(int value);
+    CombatConstants::Wounds woundType() const;
+    void setWoundType(CombatConstants::Wounds value);
 
     int overwhelming() const;
     void setOverwhelming(int value);
 
     QString name() const;
     void setName(const QString &value);
+
+    CombatConstants::Range  range() const;
+    void setRange(CombatConstants::Range  value);
+
+    bool is2Handed() const;
+    void set2Handed(bool value);
 
 private:
     QString myName;
@@ -61,8 +94,10 @@ private:
     int myDefense;
     QString myAbility;
     bool myStrength;
-    int myWoundType;
+    CombatConstants::Wounds myWoundType;
     int myOverwhelming;
+    CombatConstants::Range  myRange;
+    bool myHanded;
 };
 
 
@@ -70,35 +105,31 @@ private:
 class Combatant:public QObject
 {
     Q_OBJECT
-    Q_ENUMS(AttackType)
-    Q_ENUMS(DefenseType)
+
 public:
     explicit Combatant(QObject *parent = 0);
-    Combatant(QString name, int eva, int join, int dex, int str, int nSoak, int aSoak, int hard, QObject *parent = 0);
+    Combatant(QString name, int join, int dex, int str, int nSoak, int aSoak, int hard, QObject *parent = 0);
 
     void setHealth(QList <int> HLCounts);
 
-    enum AttackType{Withering, Decisive};
-    enum DefenseType{Overall,Evasion,Parry};
-
     int joinBattle();
 
-    int attack(int attackType, Weapon *selectedWeapon);
-    int damage(int attackType, Weapon *selectedWeapon);
-    int defense(int defenseType, Weapon *weapon, bool onslaught = true);
+    int attack(CombatConstants::Attack attackType, Weapon *selectedWeapon);
+    int damage(CombatConstants::Attack attackType, Weapon *selectedWeapon);
+    int defense(CombatConstants::Defense defenseType, Weapon *weapon, bool onslaught = true);
     void refreshTurn();
     void resetInitiative();
     void changeInitiative(int value);
     int initiative();
-    int takeDamage(int attackType, int damage, int overwhelming, int damageType);
+    int takeDamage(CombatConstants::Attack attackType, int damage, int overwhelming, CombatConstants::Wounds damageType);
 
     Weapon *weapon(int selected);
+    void addWeapon(Weapon *addition, bool equipped = false);
 
 private:
     QString myName;
     int myInitiative;
     QList<QList<int> >myHealthLevels;
-    int myEvasion;
     int myJoinBattle;
     int myDexterity;
     int myStrength;

@@ -14,7 +14,7 @@ public:
     ~CombatTracker();
 
     void addCombatant(Combatant *add);
-    void attack(Combatant * attacker, int aWeapon, Combatant *defender, int dWeapon, int attackType, int defenseType = Combatant::Overall);
+    void attack(Combatant * attacker, int aWeapon, Combatant *defender, int dWeapon, CombatConstants::Attack attackType, CombatConstants::Defense defenseType = CombatConstants::Overall);
 
     friend bool operator <( Combatant &lhs, Combatant &rhs) ;
 signals:

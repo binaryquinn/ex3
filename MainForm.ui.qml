@@ -3,6 +3,10 @@ import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.1
 
 Item {
+
+    property alias addCombatantButton: addCombatantButton
+
+
     width: 800
     height: 480
     ColumnLayout {
@@ -19,8 +23,6 @@ Item {
             id: currentRoundView
             width: 110
             height: 160
-            anchors.bottom: parent.verticalCenter
-            anchors.bottomMargin: 5
             delegate: Item {
                 x: 5
                 width: 80
@@ -64,12 +66,15 @@ Item {
             }
         }
 
+        Button {
+            id: addCombatantButton
+            text: qsTr("Add a Combatant")
+        }
+
         ListView {
             id: nextRoundView
             width: 110
             height: 160
-            anchors.top: parent.verticalCenter
-            anchors.topMargin: 5
             delegate: Item {
                 x: 5
                 width: 80
@@ -112,15 +117,16 @@ Item {
                 }
             }
         }
+
     }
-    AddCombatantDialog {
+    AttackerPanel{
         id: attackerPanel1
         anchors.bottom: parent.bottom
-     anchors.bottomMargin: 0
+        anchors.bottomMargin: 0
         anchors.top: parent.top
         anchors.topMargin: 9
         anchors.right: parent.right
-     anchors.rightMargin: 0
+        anchors.rightMargin: 0
         anchors.left: columnLayout1.right
         anchors.leftMargin: 15
     }

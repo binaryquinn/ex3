@@ -30,7 +30,7 @@ void CombatTracker::addCombatant(Combatant *add)
 
 }
 
-void CombatTracker::attack(Combatant *attacker, int attackingWeapon, Combatant *defender, int defendingWeapon, int attackType, int defenseType)
+void CombatTracker::attack(Combatant *attacker, int attackingWeapon, Combatant *defender, int defendingWeapon, CombatConstants::Attack attackType, CombatConstants::Defense defenseType)
 {
     Weapon *aWeapon = attacker->weapon(attackingWeapon);
     Weapon *dWeapon = defender->weapon(defendingWeapon);
@@ -38,7 +38,7 @@ void CombatTracker::attack(Combatant *attacker, int attackingWeapon, Combatant *
 
     if(attackResult > 0)
     {
-        int damagePool = attacker->damage(attackType, aWeapon) + (attackType == Combatant::Withering) ? attackResult : 0;
+        int damagePool = attacker->damage(attackType, aWeapon) + (attackType == CombatConstants::Withering) ? attackResult : 0;
         defender->takeDamage(attackType,damagePool,aWeapon->overwhelming(),aWeapon->woundType());
         attacker->resetInitiative();
     }

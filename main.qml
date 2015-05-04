@@ -15,7 +15,7 @@ ApplicationWindow {
             title: qsTr("&File")
             MenuItem {
                 text: qsTr("&Open")
-                onTriggered: messageDialog.show(qsTr("Open action triggered"));
+//                onTriggered: messageDialog.show(qsTr("Open action triggered"));
             }
             MenuItem {
                 text: qsTr("E&xit")
@@ -27,16 +27,20 @@ ApplicationWindow {
     MainForm {
         id: mainForm1
         anchors.fill: parent
-    }
-
-    MessageDialog {
-        id: messageDialog
-        title: qsTr("May I have your attention, please?")
-
-        function show(caption) {
-            messageDialog.text = caption;
+        addCombatantButton.onClicked:
+        {
             messageDialog.open();
         }
+    }
+
+    AddCombatantDialog{
+        id: messageDialog
+        visible: false
+        height: 460
+        width:600
+
+
+
     }
 
 }
