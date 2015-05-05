@@ -4,27 +4,32 @@ import QtQuick.Window 2.2
 import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.0
 
-ApplicationWindow {
+ApplicationWindow
+{
     title: qsTr("Exalted 3rd Edition Combat Tracker")
     width: 800
     height: 480
     visible: true
 
-    menuBar: MenuBar {
-        Menu {
+    menuBar: MenuBar
+    {
+        Menu
+        {
             title: qsTr("&File")
-            MenuItem {
+            MenuItem
+            {
                 text: qsTr("&Open")
-//                onTriggered: messageDialog.show(qsTr("Open action triggered"));
             }
-            MenuItem {
+            MenuItem
+            {
                 text: qsTr("E&xit")
                 onTriggered: Qt.quit();
             }
         }
     }
 
-    MainForm {
+    MainForm
+    {
         id: mainForm1
         anchors.fill: parent
         addCombatantButton.onClicked:
@@ -33,11 +38,13 @@ ApplicationWindow {
         }
     }
 
-    AddCombatantDialog{
+    AddCombatantDialog
+    {
         id: messageDialog
         visible: false
-        height: 460
+        height: 560
         width:600
+
 
 
 

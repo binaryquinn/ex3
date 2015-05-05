@@ -9,13 +9,12 @@ import Model 1.0
 
 Item {
     id: item2
-    width: 580
-    height: 525
+    width: 600
+    height: 560
 
     Constants{
         id:myCons
     }
-
 
     property alias nameText: nameField.text
     property alias attributeModel: attributeView.model
@@ -33,16 +32,24 @@ Item {
     property alias newOverText: newOverField.text
     property alias abilityCombo: abilityCombo
     property alias weaponsModel: weaponsView.model
+    property alias okButton: okButton
+    property alias cancelButton: cancelButton
 
     TextField {
         id: nameField
         anchors.right: armorBox.left
         anchors.rightMargin: 5
         anchors.top: parent.top
-        anchors.topMargin: 10
+        anchors.topMargin: 15
         anchors.left: parent.left
         anchors.leftMargin: 10
         placeholderText: qsTr("Name")
+        validator: RegExpValidator
+        {
+            regExp:/\S+.*/
+        }
+    width:25
+
     }
 
     GroupBox {
@@ -200,87 +207,7 @@ Item {
             id: healthView
             interactive: false
             height: parent.height - 5
-            delegate: Item {
-                id:hlDelegate
-                x: 5
-                width: parent.width
-                height: 35
-                Row{
-                    id: row2
-                    spacing: 5
-
-                    Label
-                    {
-                        id:hlLabel
-                        text:penalty
-                        anchors.verticalCenter: column1.verticalCenter
-                        horizontalAlignment: Text.AlignRight
-                        verticalAlignment: Text.AlignVCenter
-                        width:longest
-                        Component.onCompleted: if(longest < implicitWidth) longest = implicitWidth;
-
-                    }
-                    Column
-                    {
-                        id: column1
-                        width: 16
-                        height: 32
-                        spacing: 0
-                        anchors.top: parent.top
-                        Button
-                        {
-                            id: upButton
-                            width: 16
-                            height: 16
-                            iconSource: "images/Up.png"
-                            onClicked:
-                            {
-                                if(hlRepeater.model< 15)
-                                {
-                                    if(hlRepeater.model>0 &&hlRepeater.model%5 == 0) hlDelegate.height+=21
-                                    hlRepeater.model++
-                                }
-                            }
-                        }
-
-                        Button
-                        {
-                            id: downButton
-                            width: 16
-                            height: 16
-                            iconSource: "images/Down.png"
-                            onClicked:
-                            {
-                                if(hlRepeater.model > 0)
-                                {
-                                    hlRepeater.model--
-                                    if(hlRepeater.model%5 == 0 && hlRepeater.model > 0) hlDelegate.height -= 21
-                                }
-                            }
-                        }
-                    }
-                    Grid
-                    {
-
-                        rows:3
-                        columns: 5
-                        spacing:5
-                        height:parent.height
-                        width: 200
-                        Repeater
-                        {
-                            id:hlRepeater
-                            model:hlCount
-                            Image {
-                                id: image1
-                                width: 18
-                                height: 18
-                                source: "images/square-empty.png"
-                            }
-                        }
-                    }
-                }
-            }
+            delegate:HealthLevelDelegate{}
             model: ListModel {
                 ListElement {
                     penalty:"0"
@@ -312,6 +239,9 @@ Item {
     GroupBox {
         id: weaponsBox
         height: 200
+        anchors.rightMargin: 5
+        anchors.leftMargin: 5
+        anchors.topMargin: 4
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: healthBox.bottom
@@ -320,32 +250,33 @@ Item {
         title: qsTr("Weapons")
         Column{
             id: weaponLayout
-            anchors.rightMargin: 0
-            anchors.bottomMargin: -1
-            anchors.leftMargin: 0
-            anchors.topMargin: 1
-            anchors.fill: parent
-            spacing: 5
+            anchors.top: parent.top
+            anchors.topMargin: 5
+            spacing: 10
 
-            Column {
-                id: newWeaponCol
-                width: 200
-                height: 50
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 5
-                Row {
+
+
+            Row {
                     id: weaponTypeRow
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 5
                     TextField {
                         id: newWeaponField
+                        width:180
+                        height: 25
                         placeholderText: qsTr("Weapon Name")
+                        validator: RegExpValidator
+                        {
+                            regExp:/\S+.*/
+                        }
+
+
                     }
 
                     ComboBox {
                         id: abilityCombo
                         model: myCons.combatAbilities
-                        width:125
+                        width:120
                         style:ComboBoxStyle
                         {
                             label:Label
@@ -378,7 +309,7 @@ Item {
                     }
                 }
 
-                Row {
+            Row {
                     id: weaponStatRow
                     width: 200
                     height: 23
@@ -387,27 +318,29 @@ Item {
                     spacing: 5
                     TextField {
                         id: newAccField
-                        width:80
-                        placeholderText: qsTr("Accuracy")
+            width:80
+            height: 25
+            placeholderText: qsTr("Accuracy")
                         validator: IntValidator{}
                     }
 
                     TextField {
                         id: newAtkField
                         placeholderText: qsTr("Attack")
-                        width:80
-                        validator: IntValidator{}
+            width:80
+            height: 25
+            validator: IntValidator{}
                     }
 
                     ComboBox {
                         id: dmgTypeCombo
                         model:myCons.damageTypes
-                        width:170
+                        width:130
                         style:ComboBoxStyle
                         {
                             label:Label
                             {
-                                text:(dmgTypeCombo.currentIndex == -1)? "Damage Type" : "Damage Type: "+dmgTypeCombo.currentText
+                                text:(dmgTypeCombo.currentIndex == -1)? "Damage Type" : dmgTypeCombo.currentText + " Damage"
                             }
                         }
                     }
@@ -415,24 +348,25 @@ Item {
                     TextField {
                         id: newDefField
                         placeholderText: qsTr("Defense")
-                        width:80
-                        validator: IntValidator{}
+            width:80
+            height: 25
+            validator: IntValidator{}
                     }
                     TextField {
                         id: newOverField
                         placeholderText: qsTr("Overwhelming")
-                        width:80
-                        validator: IntValidator{}
+            width:80
+            height: 25
+            validator: IntValidator{}
                     }
                 }
-            }
+
             TableView{
                 id: weaponsView
-                height:weaponsBox.height - (newWeaponCol.height + 7 * parent.spacing)
+                height: 100
+                width:weaponsBox.width - 20
+                anchors.horizontalCenter: parent.horizontalCenter
 
-                anchors.margins: 5
-                anchors.right: parent.right
-                anchors.left: parent.left
                 model:ListModel{}
                 TableViewColumn {
                     role: "name"
@@ -457,12 +391,40 @@ Item {
                 TableViewColumn {
                     role: "over"
                     title: "Overwhelming"
-                    width: 80
-                }
-            }
-        }
+        width: 80
     }
-    states:[
+}
+}
+}
+
+    Row {
+        id: buttonRow
+    x: 338
+    width: 160
+    anchors.bottom: parent.bottom
+    anchors.bottomMargin: 9
+    anchors.top: weaponsBox.bottom
+    anchors.topMargin: 11
+    anchors.rightMargin: 5
+    spacing: 10
+    anchors.right: parent.right
+
+
+
+    Button {
+        id: okButton
+        text: qsTr("OK")
+        enabled: nameField.text.length > 0
+        anchors.verticalCenter: parent.verticalCenter
+    }
+    Button {
+        id: cancelButton
+        text: qsTr("Cancel")
+        anchors.verticalCenter: parent.verticalCenter
+    }
+}
+
+states:[
         State{
             name: "rangedState"
             when: abilityCombo.currentIndex == 0 || abilityCombo.currentIndex === 4

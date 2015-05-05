@@ -108,10 +108,10 @@ class Combatant:public QObject
 
 public:
     explicit Combatant(QObject *parent = 0);
-    Combatant(QString name, int join, int dex, int str, int nSoak, int aSoak, int hard, QObject *parent = 0);
+    Combatant(QString name, int dex, int str, int sta, int wit, QObject *parent = 0);
 
     void setHealth(QList <int> HLCounts);
-
+    void setArmor(int soak, int hardness, int penalty);
     int joinBattle();
 
     int attack(CombatConstants::Attack attackType, Weapon *selectedWeapon);
@@ -130,15 +130,16 @@ private:
     QString myName;
     int myInitiative;
     QList<QList<int> >myHealthLevels;
-    int myJoinBattle;
-    int myDexterity;
     int myStrength;
+    int myDexterity;
+    int myStamina;
+    int myWits;
     QMap<QString,int> myCombatAbilities;
     QList<Weapon *> myPanoply;
     QList<Weapon *> equippedWeapons;
-    int myNaturalSoak;
     int myArmorSoak;
     int myHardness;
+    int myMobilityPenalty;
     int myOnslaught;
     QPair<int,int> bashingEnd;
     QPair<int,int> lethalEnd;

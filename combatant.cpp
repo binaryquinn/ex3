@@ -1,13 +1,13 @@
 #include "combatant.h"
 
 
-Combatant::Combatant(QObject *parent):QObject(parent), myName(""), myJoinBattle(0), myDexterity(0), myStrength(0), myNaturalSoak(0), myArmorSoak(0),myHardness(0)
+Combatant::Combatant(QObject *parent):QObject(parent), myName(""), myDexterity(0), myStrength(0), myStamina(0), myWits(0), myArmorSoak(0),myHardness(0)
 {
     initialize();
 }
 
-Combatant::Combatant(QString name, int join, int dex, int str, int nSoak, int aSoak, int hard, QObject *parent):
-    QObject(parent), myName(name), myJoinBattle(join), myDexterity(dex), myStrength(str), myNaturalSoak(nSoak), myArmorSoak(aSoak),myHardness(hard)
+Combatant::Combatant(QString name,  int dex, int str, int sta, int wit, QObject *parent):
+    QObject(parent), myName(name), myDexterity(dex), myStrength(str), myStamina(sta), myWits(wit), myArmorSoak(0), myHardness(0)
 {
     initialize();
 }
@@ -29,9 +29,16 @@ void Combatant::setHealth(QList<int> HLCounts)
     }
 }
 
+void Combatant::setArmor(int soak, int hardness, int penalty)
+{
+    myArmorSoak = soak;
+    myHardness = hardness;
+    myMobilityPenalty = penalty;
+}
+
 int Combatant::joinBattle()
 {
-    myInitiative = 3 + D10::roll(myJoinBattle);
+    myInitiative = 3 + D10::roll(myWits + myCombatAbilities["Awareness"]);
     return myInitiative;
 }
 
@@ -101,7 +108,7 @@ int Combatant::takeDamage(CombatConstants::Attack attackType, int damage, int ov
 
     if(attackType == CombatConstants::Withering)
     {
-       int postSoak = damage - (myNaturalSoak + myArmorSoak); //calculating dice pool
+       int postSoak = damage - (myStamina + myArmorSoak); //calculating dice pool
        if(postSoak < overwhelming)
            postSoak = overwhelming;
        postSoak = D10::roll(postSoak); //dice pool becomes dice successes

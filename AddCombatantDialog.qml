@@ -7,10 +7,11 @@ import Model 1.0
 Dialog{
     id:combatantDialog
     title:"Add a new combatant"
-    standardButtons: StandardButton.Ok|StandardButton.Cancel
+    //standardButtons: StandardButton.Ok|StandardButton.Cancel
 
 
-    AddCombatantDialogForm {
+    contentItem: AddCombatantDialogForm {
+
 
         addWeaponButton.onClicked:
         {
@@ -28,5 +29,8 @@ Dialog{
 
             }
         }
+        okButton.onClicked: accepted()
+       cancelButton.onClicked: rejected()
     }
+
 }

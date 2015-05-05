@@ -6,6 +6,10 @@
         <file>AttackerPanelForm.ui.qml</file>
         <file>AddCombatantDialog.qml</file>
         <file>AddCombatantDialogForm.ui.qml</file>
+        <file>UpDownColumn.qml</file>
+        <file>UpDownColumnForm.ui.qml</file>
+        <file>HealthLevelDelegate.qml</file>
+        <file>HealthLevelDelegateForm.ui.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>square-empty.png</file>

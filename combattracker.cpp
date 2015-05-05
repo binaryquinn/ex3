@@ -17,7 +17,7 @@ void CombatTracker::addCombatant(Combatant *add)
     QList<Combatant *> *host;
 
     if(!inBattle)
-        host = &myCombatants;
+        host = &myCurrentRound;
     else
         host = &myNextRound;
 
@@ -43,6 +43,22 @@ void CombatTracker::attack(Combatant *attacker, int attackingWeapon, Combatant *
         attacker->resetInitiative();
     }
 }
+
+QQmlListProperty<Combatant> CombatTracker::currentRound()
+{
+    return QQmlListProperty<Combatant>(this,myCurrentRound);
+}
+
+QQmlListProperty<Combatant> CombatTracker::nextRound()
+{
+    return QQmlListProperty<Combatant>(this,myNextRound);
+}
+
+void CombatTracker::add(QString name, int dex, int str,int sta, int wit)
+{
+    addCombatant(new Combatant(name,dex,str,sta,wit));
+}
+
 
 void CombatTracker::binaryInsertion(QList<Combatant *> *host, Combatant* add, int left, int right)
 {
