@@ -10,7 +10,6 @@ ApplicationWindow
     width: 800
     height: 480
     visible: true
-
     menuBar: MenuBar
     {
         Menu
@@ -25,6 +24,7 @@ ApplicationWindow
                 text: qsTr("E&xit")
                 onTriggered: Qt.quit();
             }
+
         }
     }
 
@@ -32,22 +32,15 @@ ApplicationWindow
     {
         id: mainForm1
         anchors.fill: parent
-        addCombatantButton.onClicked:
-        {
-            messageDialog.open();
-        }
+        addCombatantButton.onClicked: messageDialog.open()
     }
 
-    AddCombatantDialog
-    {
-        id: messageDialog
-        visible: false
-        height: 560
-        width:600
+            AddCombatantDialog
+            {
+                id: messageDialog
+                height: 560
+                width:600
 
-
-
-
-    }
+            }
 
 }

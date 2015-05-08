@@ -17,13 +17,12 @@ Item {
     }
 
     property alias nameText: nameField.text
-    property alias attributeModel: attributeView.model
+    property alias attributeModel: attrModel
     property alias soakText: soakField.text
     property alias hardnessText: hardnessField.text
     property alias mpText: mpField.text
-    property alias abilityModel: abilityView.model
-    property alias healthModel: healthView.model
-    property int longest: 0
+    property alias abilityModel: abilityRepeater.model
+    property alias healthModel: hlModel
     property alias addWeaponButton: addWeaponButton
     property alias newWeaponText: newWeaponField.text
     property alias newAccText: newAccField.text
@@ -34,6 +33,27 @@ Item {
     property alias weaponsModel: weaponsView.model
     property alias okButton: okButton
     property alias cancelButton: cancelButton
+
+    ListModel
+    {
+        id:attrModel
+        ListElement {
+            name: "Strength"
+            stat:1
+        }
+        ListElement {
+            name: "Dexterity"
+            stat:1
+        }
+        ListElement {
+            name: "Stamina"
+            stat:1
+        }
+        ListElement {
+            name: "Wits"
+            stat:1
+        }
+    }
 
     TextField {
         id: nameField
@@ -94,98 +114,51 @@ Item {
         }
         width:nameField.width
         title: qsTr("Attributes")
+        Row{
+            Repeater {
+                id: attributeView
+                model:attrModel
+                delegate:TraitViewDelegate
+                {
+                   id:attributeDelegate
+                    traitRatingBox.currentIndex: stat - 1
+                    traitRatingBox.model:[1,2,3,4,5]
+                    parentModel:attrModel
+                }
 
-        ListView {
-            id: attributeView
-            interactive: false
-            anchors.fill: parent
-            clip: true
-            orientation: ListView.Horizontal
-            delegate: Item {
-                id: attributeItem
-                x: 5
-                width: 100
-                height: 30
-                Row {
-                    Label {
-                        id: attributeLabel
-                        y: 11
-                        width: 59
-                        height: 20
-                        text: name + ":"
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignRight
-                    }
-
-                    ComboBox {
-                        id: attrRatingBox
-                        y: 11
-                        width: 30
-                        height: 20
-                        model: [1,2,3,4,5]
-                    }
-                }
-            }
-            model: ListModel {
-                ListElement {
-                    name: "Strength"
-                }
-                ListElement {
-                    name: "Dexterity"
-                }
-                ListElement {
-                    name: "Stamina"
-                }
-                ListElement {
-                    name: "Wits"
-                }
             }
         }
     }
 
-    GroupBox {
+    GroupBox
+    {
         id: abilityBox
+        anchors.right: parent.horizontalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: 5
         anchors.top: healthBox.top
         anchors.bottom: healthBox.bottom
 
-        width: parent.width/2
         title: qsTr("Abilities")
 
-        GridView {
-            id: abilityView
-            interactive: false
-            anchors.fill: parent
-            cellHeight: 30
-            cellWidth: 120
-            clip: true
-            delegate: Item {
-                id: abilityItem
-                x: 5
-                width: 120
-                height: 30
-                Row {
-                    id: row1
-                    spacing:5
-                    Label {
-                        id: abilityLabel
-                        y: 11
-                        width: 80
-                        height: 20
-                        text: modelData+ ":"
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignRight
-                    }
+        Grid {
 
-                    ComboBox {
-                        id: abiRatingCombo
-                        y: 11
-                        width: 30
-                        height: 20
-                        model: 6
-                    }
-                }
+        id: abilityGrid
+        spacing: 5
+        columns: 2
+
+        clip: true
+        Repeater{
+            id: abilityRepeater
+            model:abilityList
+            delegate: TraitViewDelegate
+            {
+                id:abilityDelegate
+                traitRatingBox.model:6
+                parentModel:abilityList
+
             }
-            model: myCons.allAbilities
+        }
         }
     }
 
@@ -207,8 +180,9 @@ Item {
             id: healthView
             interactive: false
             height: parent.height - 5
-            delegate:HealthLevelDelegate{}
+            delegate:HealthLevelDelegate{parentModel:healthModel}
             model: ListModel {
+                id:hlModel
                 ListElement {
                     penalty:"0"
                     hlCount:1

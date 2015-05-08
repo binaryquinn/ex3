@@ -10,6 +10,8 @@
         <file>UpDownColumnForm.ui.qml</file>
         <file>HealthLevelDelegate.qml</file>
         <file>HealthLevelDelegateForm.ui.qml</file>
+        <file>TraitViewDelegate.qml</file>
+        <file>TraitViewDelegateForm.ui.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>square-empty.png</file>

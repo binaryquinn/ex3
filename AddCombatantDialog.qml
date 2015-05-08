@@ -4,14 +4,53 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Controls.Styles 1.2
 import Model 1.0
 
-Dialog{
+Dialog
+{
+
     id:combatantDialog
     title:"Add a new combatant"
-    //standardButtons: StandardButton.Ok|StandardButton.Cancel
 
+    property int longest: 0
 
-    contentItem: AddCombatantDialogForm {
+    ListModel
+    {
+        id: abilityList
+    Component.onCompleted:{
 
+            var abilityStrings = myCons.allAbilities;
+            var abilityIndex = 0;
+            for(;abilityIndex< abilityStrings.length;abilityIndex++)
+                  abilityList.append({"name":abilityStrings[abilityIndex], "stat":0});
+        }
+    }
+
+    contentItem: AddCombatantDialogForm
+    {
+
+        id:form
+
+        function clearFields()
+        {
+            nameText = "";
+            soakText = hardnessText =  mpText = "";
+            newWeaponText = newAccText = newAtkText = newDefText = newOverText = "";
+
+            var index = 0;
+            for(; index < attributeModel.count; index++)
+            {
+                attributeModel.set(index,{"stat":1});
+            }
+            for(; index < abilityList.count; index++)
+                abilityList.set(index,{"stat":0});
+            abilityCombo.currentIndex = 0;
+
+            healthModel.set(0,{"hlCount":1});
+            healthModel.set(1,{"hlCount":2});
+            healthModel.set(2,{"hlCount":2});
+            healthModel.set(3,{"hlCount":1});
+            healthModel.set(4,{"hlCount":1});
+        }
+        abilityModel:abilityList
 
         addWeaponButton.onClicked:
         {
@@ -29,8 +68,23 @@ Dialog{
 
             }
         }
-        okButton.onClicked: accepted()
-       cancelButton.onClicked: rejected()
+        okButton.onClicked:
+        {
+            var str = attributeModel.get(0).stat;
+            var dex = attributeModel.get(1).stat;
+            var sta = attributeModel.get(2).stat;
+            var wit = attributeModel.get(3).stat;
+
+            Tracker.add(nameText,str, dex, sta, wit );
+            accept();
+
+
+        }
+       cancelButton.onClicked:
+       {
+           reject();
+       }
     }
 
+onVisibleChanged: if(!visible) form.clearFields();
 }

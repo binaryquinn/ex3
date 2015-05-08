@@ -28,6 +28,8 @@ void CombatTracker::addCombatant(Combatant *add)
     else
        binaryInsertion(host,add,0,host->count()-1);
 
+    if(!inBattle) emit currentRoundChanged();
+    else emit nextRoundChanged();
 }
 
 void CombatTracker::attack(Combatant *attacker, int attackingWeapon, Combatant *defender, int defendingWeapon, CombatConstants::Attack attackType, CombatConstants::Defense defenseType)

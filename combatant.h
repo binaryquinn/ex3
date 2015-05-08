@@ -8,7 +8,7 @@
 #include <QString>
 #include <QQmlListProperty>
 
-
+#include <QStringListModel>
 class D10
 {
 public:
@@ -105,7 +105,7 @@ private:
 class Combatant:public QObject
 {
     Q_OBJECT
-
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
 public:
     explicit Combatant(QObject *parent = 0);
     Combatant(QString name, int dex, int str, int sta, int wit, QObject *parent = 0);
@@ -125,6 +125,10 @@ public:
 
     Weapon *weapon(int selected);
     void addWeapon(Weapon *addition, bool equipped = false);
+    QString name() const;
+
+signals:
+    void nameChanged();
 
 private:
     QString myName;

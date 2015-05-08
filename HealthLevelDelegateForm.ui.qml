@@ -4,10 +4,12 @@ import QtQuick.Controls 1.3
 Item {
     property alias hlColumn:hlColumn
     property alias hlRepeater: hlRepeater
-
+    property int delegateIndex;
     id:hlDelegate
     x: 5
     height: 35
+
+
     Row{
         id: row2
         spacing: 5
@@ -45,6 +47,7 @@ Item {
                     height: 18
                     source: "images/square-empty.png"
                 }
+                Component.onCompleted: delegateIndex = index
             }
         }
     }

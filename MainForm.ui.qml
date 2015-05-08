@@ -30,12 +30,6 @@ Item {
                 Row {
                     id: row1
                     spacing: 10
-                    Rectangle {
-                        width: 40
-                        height: 40
-                        color: colorCode
-                    }
-
                     Text {
                         text: name
                         font.bold: true

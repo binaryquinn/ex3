@@ -1,13 +1,13 @@
 #include "combatant.h"
 
 
-Combatant::Combatant(QObject *parent):QObject(parent), myName(""), myDexterity(0), myStrength(0), myStamina(0), myWits(0), myArmorSoak(0),myHardness(0)
+Combatant::Combatant(QObject *parent):QObject(parent), myName(""), myStrength(0), myDexterity(0), myStamina(0), myWits(0), myArmorSoak(0),myHardness(0)
 {
     initialize();
 }
 
-Combatant::Combatant(QString name,  int dex, int str, int sta, int wit, QObject *parent):
-    QObject(parent), myName(name), myDexterity(dex), myStrength(str), myStamina(sta), myWits(wit), myArmorSoak(0), myHardness(0)
+Combatant::Combatant(QString name, int str, int dex, int sta, int wit, QObject *parent):
+    QObject(parent), myName(name), myStrength(str), myDexterity(dex), myStamina(sta), myWits(wit), myArmorSoak(0), myHardness(0)
 {
     initialize();
 }
@@ -159,6 +159,10 @@ void Combatant::addWeapon(Weapon *addition, bool equipped)
     {
 
     }
+}
+QString Combatant::name() const
+{
+    return myName;
 }
 
 
@@ -326,6 +330,7 @@ QStringList CombatConstants::allAbilities()
     QStringList bothLists;
     bothLists << myOtherAbilities << combatAbilities();
     bothLists.sort();
+
     return bothLists;
 
 
@@ -348,4 +353,3 @@ QStringList CombatConstants::damageTypes()
     }
     return myDamageTypes;
 }
-
