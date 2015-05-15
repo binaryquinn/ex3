@@ -2,6 +2,12 @@
 
 CombatTracker::CombatTracker(QObject *parent) : QObject(parent)
 {
+    foreach(QString ability,CombatConstants::allAbilities())
+        myDialogAbilities.append(new TraitRating(ability,0));
+
+    foreach(QString attributes,CombatConstants::attributes())
+        myDialogAttributes.append(new TraitRating(attributes,1));
+
 
 }
 
@@ -56,9 +62,25 @@ QQmlListProperty<Combatant> CombatTracker::nextRound()
     return QQmlListProperty<Combatant>(this,myNextRound);
 }
 
-void CombatTracker::add(QString name, int dex, int str,int sta, int wit)
+QQmlListProperty<TraitRating> CombatTracker::attributes()
 {
-    addCombatant(new Combatant(name,dex,str,sta,wit));
+    return QQmlListProperty<TraitRating>(this,myDialogAttributes);
+}
+
+QQmlListProperty<TraitRating> CombatTracker::abilities()
+{
+    return QQmlListProperty<TraitRating>(this,myDialogAbilities);
+}
+
+void CombatTracker::add(QString name, int soak,int hardness, int penalty )
+{
+    int dex = myDialogAttributes[1]->property("stat").toInt();
+    int str = myDialogAttributes[0]->property("stat").toInt();
+    int sta = myDialogAttributes[2]->property("stat").toInt();
+    int wit = myDialogAttributes[3]->property("stat").toInt();
+    Combatant * newbie = new Combatant(name,dex,str,sta,wit);
+    newbie->setArmor(soak,hardness,penalty);
+    addCombatant(newbie);
 }
 
 
@@ -81,4 +103,15 @@ void CombatTracker::binaryInsertion(QList<Combatant *> *host, Combatant* add, in
 bool operator <( Combatant &lhs, Combatant &rhs)
 {
     return lhs.initiative() < rhs.initiative();
+}
+
+
+TraitRating::TraitRating(QObject *parent):QObject(parent), myName(""), myRating(0)
+{
+
+}
+
+TraitRating::TraitRating(QString name, unsigned int rating, QObject *parent):QObject(parent), myName(name), myRating(rating)
+{
+
 }

@@ -5,7 +5,8 @@ QT += qml quick widgets
 SOURCES += main.cpp \
     combatant.cpp \
     healthtrack.cpp \
-    combattracker.cpp
+    combattracker.cpp \
+    combatconstants.cpp
 
 RESOURCES += qml.qrc
 
@@ -18,4 +19,5 @@ include(deployment.pri)
 HEADERS += \
     combatant.h \
     healthtrack.h \
-    combattracker.h
+    combattracker.h \
+    combatconstants.h

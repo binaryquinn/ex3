@@ -42,6 +42,13 @@ int Combatant::joinBattle()
     return myInitiative;
 }
 
+QList<int> Combatant::armor()
+{
+    QList<int> myArmor;
+    myArmor << myArmorSoak << myHardness << myMobilityPenalty;
+    return myArmor;
+}
+
 int Combatant::attack(CombatConstants::Attack attackType, Weapon * selectedWeapon)
 {
     if(attackType == CombatConstants::Withering)
@@ -144,6 +151,12 @@ int Combatant::takeDamage(CombatConstants::Attack attackType, int damage, int ov
     return 0;
 }
 
+void Combatant::setAbility(QString name, int value)
+{
+    if(myCombatAbilities.contains(name))
+        myCombatAbilities[name] = value;
+}
+
 
 
 
@@ -152,17 +165,18 @@ Weapon *Combatant::weapon(int selected)
     return equippedWeapons[selected];
 }
 
-void Combatant::addWeapon(Weapon *addition, bool equipped)
+void Combatant::addWeapon(Weapon *addition)
 {
     myPanoply.append(addition);
-    if(equipped)
-    {
-
-    }
 }
+
 QString Combatant::name() const
 {
     return myName;
+}
+int Combatant::stamina() const
+{
+    return myStamina;
 }
 
 
@@ -174,6 +188,9 @@ void Combatant::initialize()
     defaultHealth << 1 << 2 << 2 << 1 <<1;
     setHealth(defaultHealth);
     bashingEnd = lethalEnd = aggravatedEnd = QPair<int,int> (0,0);
+    QStringList abilist = CombatConstants::combatAbilities();
+    foreach(QString ability , abilist)
+        myCombatAbilities.insert(ability,0);
 }
 
 int Combatant::parryDefense(Weapon *weapon)
@@ -290,10 +307,6 @@ void Weapon::set2Handed(bool value)
     myHanded = value;
 }
 
-
-
-
-
 int D10::roll(int dieCount, bool dblSuccess, int dblThreshold)
 {
     int successes = 0;
@@ -314,42 +327,3 @@ int D10::roll(int dieCount, bool dblSuccess, int dblThreshold)
 }
 
 
-QStringList CombatConstants::combatAbilities()
-{
-    if(myAttackAbilities.empty())
-    {
-        myAttackAbilities << "Archery" << "Brawl" << "Martial Arts" << "Melee"<< "Thrown";
-    }
-    return myAttackAbilities;
-}
-
-QStringList CombatConstants::allAbilities()
-{
-    if(myOtherAbilities.empty())
-        myOtherAbilities << "Athletics" << "Awareness" << "Dodge"  << "Resistance" << "Ride" ;
-    QStringList bothLists;
-    bothLists << myOtherAbilities << combatAbilities();
-    bothLists.sort();
-
-    return bothLists;
-
-
-}
-
-QStringList CombatConstants::ranges()
-{
-    if(myRanges.empty())
-    {
-        myRanges<< "Close" << "Short" << "Medium" << "Long"<< "Extreme";
-    }
-    return myRanges;
-}
-
-QStringList CombatConstants::damageTypes()
-{
-    if(myDamageTypes.empty())
-    {
-        myDamageTypes<< "Bashing" << "Lethal" << "Aggravated";
-    }
-    return myDamageTypes;
-}
