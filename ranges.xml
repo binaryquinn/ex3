@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Ranges>
+    <Mundane>
+        <Thrown Close= "4"  Short = "3" Medium = "2" Long= "-1" Extreme = "-3" />
+        <Archery Close= "-2"  Short = "4" Medium = "2" Long= "0" Extreme = "-2" />
+    </Mundane>
+    <Artifact>
+        <Thrown Close= "5"  Short = "4" Medium = "3" Long= "0" Extreme = "-2" />
+        <Archery Close= "-1"  Short = "5" Medium = "3" Long= "1" Extreme = "-1" />
+    </Artifact>
+</Ranges>

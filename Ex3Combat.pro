@@ -6,7 +6,9 @@ SOURCES += main.cpp \
     combatant.cpp \
     healthtrack.cpp \
     combattracker.cpp \
-    combatconstants.cpp
+    combatconstants.cpp \
+    weapon.cpp \
+    newcombatantdialog.cpp
 
 RESOURCES += qml.qrc
 
@@ -20,4 +22,6 @@ HEADERS += \
     combatant.h \
     healthtrack.h \
     combattracker.h \
-    combatconstants.h
+    combatconstants.h \
+    weapon.h \
+    newcombatantdialog.h

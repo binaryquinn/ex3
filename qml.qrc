@@ -12,4 +12,8 @@
         <file>Down.png</file>
         <file>Up.png</file>
     </qresource>
+    <qresource prefix="/defaults">
+        <file>ranges.xml</file>
+        <file>weapons.xml</file>
+    </qresource>
 </RCC>

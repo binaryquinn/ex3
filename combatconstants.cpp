@@ -1,6 +1,5 @@
 #include "combatconstants.h"
 
-
 QStringList CombatConstants::myAttackAbilities;
 QStringList CombatConstants::myOtherAbilities;
 QStringList CombatConstants::myRanges;

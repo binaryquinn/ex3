@@ -7,6 +7,7 @@ Item {
     width: 600
     height: 250
 
+
     ListModel {
         id:tempModel
         ListElement {
@@ -30,7 +31,21 @@ Item {
         }
     }
 
+    Component
+    {
+        id: highlightBar
 
+        Rectangle
+        {
+            id:highlightRect
+            width: 0
+            height: 50
+            color:!!parent && parent.parent.activeFocus?"#FFFF88":"#FFFFDD";
+            y: (!!parent && parent.currentItem !== undefined)? parent.currentItem.y : 0;
+
+        }
+
+    }
 
     Label {
         id: nameLabel
@@ -82,13 +97,13 @@ Item {
         x: 28
         y: 150
         text: qsTr("Do What?")
-        anchors.bottom: rectangle1.top
+        anchors.bottom: doWhatScroll.top
         anchors.bottomMargin: 5
-        anchors.horizontalCenter: rectangle1.horizontalCenter
+        anchors.horizontalCenter: doWhatScroll.horizontalCenter
     }
 
     ScrollView {
-        id: rectangle1
+        id: doWhatScroll
         width: (item1.width/3)-40
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
@@ -98,29 +113,28 @@ Item {
         anchors.leftMargin: 10
 
         ListView {
-            id: listView1
+            id: doWhatView
             anchors.fill: parent
             delegate: Item {
                 x: 5
-                width: 80
+                width: parent.width
                 height: 40
-                Row {
-                    id: row1
-                    spacing: 10
-                    Rectangle {
-                        width: 40
-                        height: 40
-                        color: colorCode
-                    }
-
-                    Text {
-                        text: name
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            doWhatView.currentIndex = index;
+                        }
+                    Label{
+                        text: modelData
                         font.bold: true
                         anchors.verticalCenter: parent.verticalCenter
-                    }
+
+                       }
                 }
             }
-            model:tempModel
+            model:Tracker.actions
+            highlight: highlightBar
+            Component.onCompleted: currentIndex = -1;
         }
     }
 
@@ -140,7 +154,7 @@ Item {
     ScrollView{
         id: rectangle2
         x: 138
-        width: rectangle1.width
+        width: doWhatScroll.width
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
@@ -157,12 +171,6 @@ Item {
                 Row {
                     id: row2
                     spacing: 10
-                    Rectangle {
-                        width: 40
-                        height: 40
-                        color: colorCode
-                    }
-
                     Text {
                         text: name
                         font.bold: true
@@ -170,7 +178,7 @@ Item {
                     }
                 }
             }
-            model:tempModel
+            model:Tracker.targets
         }
     }
 
@@ -188,7 +196,7 @@ Item {
     ScrollView {
         id: rectangle3
         x: 272
-        width: rectangle1.width
+        width: doWhatScroll.width
         anchors.right: parent.right
         anchors.rightMargin: 10
         anchors.bottom: parent.bottom

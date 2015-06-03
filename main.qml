@@ -52,7 +52,7 @@ ColumnLayout {
                 id: row1
                 spacing: 10
                 Text {
-                    text: name
+                    text: name + " ("+ initiative + ")"
                     font.bold: true
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -115,6 +115,7 @@ AddCombatantDialog
     id: messageDialog
     height: 560
     width:600
+    onVisibleChanged:if(!visible) Tracker.cleanDialog();
 }
 
 }

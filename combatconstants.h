@@ -3,10 +3,11 @@
 
 #include <QObject>
 #include <QStringList>
-
 Q_DECLARE_METATYPE(QStringList)
+
 class CombatConstants: public QObject
 {
+
     Q_OBJECT
     Q_ENUMS(Wounds)
     Q_ENUMS(Attack)
@@ -19,7 +20,9 @@ class CombatConstants: public QObject
     Q_PROPERTY(QStringList damageTypes READ damageTypes CONSTANT)
     Q_PROPERTY(QStringList attributes READ attributes CONSTANT)
 
+
 public:
+
     enum Wounds{None, Bashing, Lethal, Aggravated};
     enum Attack{Withering, Decisive};
     enum Defense{Overall, Evasion, Parry};
@@ -33,12 +36,14 @@ public slots:
     static QStringList damageTypes();
     static QStringList attributes();
 
+
 private:
     static QStringList myAttackAbilities;
     static QStringList myOtherAbilities;
     static QStringList myRanges;
     static QStringList myDamageTypes;
     static QStringList myAttributes;
+
 };
 
 #endif // COMBATCONSTANTS_H

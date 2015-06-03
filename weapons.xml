@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Weapons>
+    <Mundane>
+        <Light Damage="7" Overwhelming="1" Accuracy = "4" Defense ="0" />
+        <Medium  Damage="9" Overwhelming="1" Accuracy = "2" Defense ="1" />
+        <Heavy  Damage="11" Overwhelming="1" Accuracy = "0" Defense ="-1" />
+    </Mundane>
+    <Artifact>
+        <Light Damage="10" Overwhelming="3" Accuracy = "5" Defense ="1" />
+        <Medium  Damage="12" Overwhelming="4" Accuracy = "3" Defense ="1" />
+        <Heavy  Damage="14" Overwhelming="5" Accuracy = "1" Defense ="0" />
+    </Artifact>
+</Weapons>

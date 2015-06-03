@@ -1,14 +1,14 @@
 #include "healthtrack.h"
 
-HealthTrack::HealthTrack(QObject *parent):QAbstractTableModel(parent)
+HealthTrack::HealthTrack(QObject *parent):QObject(parent)
 {
 
-    QList<CombatConstants::Wounds> hLevel;
-    hLevel << CombatConstants::None;
-    for(int loop = 0; loop <5;loop++)
-        myHealth.append(hLevel);
-    myHealth[1]<< CombatConstants::None;
-    myHealth[2]<< CombatConstants::None;
+    for(int loop = 0; loop < 7;loop++)
+        myHealth << CombatConstants::None;
+
+    myLevels << QPair<int,int>(0,1) << QPair<int,int>(-1,2) << QPair<int,int>(-2,2) << QPair<int,int>(-4,1) << QPair<int,int>(INT_MAX,1);
+    bashingCount = lethalCount = aggravatedCount = myWoundPenalty = 0;
+    countRollOver = true;
 }
 
 HealthTrack::~HealthTrack()
@@ -16,38 +16,97 @@ HealthTrack::~HealthTrack()
 
 }
 
-int HealthTrack::rowCount(const QModelIndex &parent) const
+
+int HealthTrack::currentPenalty()
 {
+    return myWoundPenalty;
+}
+
+void HealthTrack::takeDamage(int amount, CombatConstants::Wounds type)
+{
+    int rollOver = 0;
+    int start = 0;
+    switch(type)
+    {
+        case CombatConstants::Aggravated :
+        {
+            aggravatedCount += amount;
+            start = 0;
+            break;
+        };
+        case CombatConstants::Lethal :
+        {
+            lethalCount += amount;
+            start = aggravatedCount;
+            break;
+        };
+        case CombatConstants::Bashing :
+        {
+            bashingCount += amount;
+            start = aggravatedCount + lethalCount;
+            break;
+        };
+        default: return;
+    };
+    if(start < myHealth.count())
+    {
+        for(int counter = 0;counter < amount; counter++)
+        {
+            myHealth.insert(start,type);
+            if(myHealth.last() == CombatConstants::Bashing)
+                rollOver++;
+            myHealth.pop_back();
+        }
+        if(countRollOver)
+        {
+            if(rollOver > 0)
+            {
+                countRollOver = false;
+                takeDamage(rollOver, CombatConstants::Lethal);
+                countRollOver = true;
+            }
+            emit healthChanged();
+            int wounds = aggravatedCount + lethalCount + bashingCount;
+            int loop = 0;
+            int oldPenalty = myWoundPenalty;
+            for(;loop < myLevels.count() && wounds > 0;loop++)
+                wounds -= myLevels[loop].second;
+            myWoundPenalty = (loop > myLevels.count())? myLevels.last().first : myLevels[loop].first;
+            if(oldPenalty != myWoundPenalty)
+                emit penaltyChanged();
+        }
+    }
 
 }
 
-int HealthTrack::columnCount(const QModelIndex &parent) const
+bool HealthTrack::isDead()
 {
-
+    return (myHealth.last() > CombatConstants::Bashing);
 }
 
-QVariant HealthTrack::data(const QModelIndex &index, int role) const
+bool HealthTrack::isIncapacitated()
 {
-
+    return (myHealth.last() == CombatConstants::Bashing);
 }
 
-bool HealthTrack::setData(const QModelIndex &index, const QVariant &value, int role)
+void HealthTrack::setHealthLevel(int level, int number)
 {
-
+    if(level > -1 && level < myLevels.count())
+    {
+        int difference = myLevels[level].second - number;
+        if(difference != 0)
+        {
+            if(difference > 0)
+            {
+                for(; difference > 0; difference--)
+                    myHealth.append(CombatConstants::None);
+            }
+            else
+            {
+                for(; difference < 0; difference++)
+                    myHealth.pop_back();
+            }
+            emit healthChanged();
+        }
+    }
 }
-
-Qt::ItemFlags HealthTrack::flags(const QModelIndex &index) const
-{
-
-}
-
-bool HealthTrack::insertRows(int row, int count, const QModelIndex &parent)
-{
-
-}
-
-bool HealthTrack::removeRows(int row, int count, const QModelIndex &parent)
-{
-
-}
-
