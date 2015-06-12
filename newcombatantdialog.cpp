@@ -5,10 +5,10 @@
 NewCombatantDialog::NewCombatantDialog(QObject *parent) : QObject(parent)
 {
     foreach(QString ability,CombatConstants::allAbilities())
-        myAbilities.append(new TraitRating(ability,5));
+        myAbilities.append(new TraitRating(ability,0));
 
     foreach(QString attributes,CombatConstants::attributes())
-        myAttributes.append(new TraitRating(attributes,5));
+        myAttributes.append(new TraitRating(attributes,1));
 
         myHLs.append(new TraitRating("0", 1));
         myHLs.append(new TraitRating("-1", 2));
@@ -45,10 +45,10 @@ void NewCombatantDialog::cleanDialog()
     int cleaner = 0;
 
     for(;cleaner < myAttributes.count();cleaner++)
-        myAttributes[cleaner]->setProperty("stat",5);
+        myAttributes[cleaner]->setProperty("stat",1);
 
     for(cleaner = 0;cleaner < myAbilities.count();cleaner++)
-        myAbilities[cleaner]->setProperty("stat",5);
+        myAbilities[cleaner]->setProperty("stat",0);
 
     myHLs[0]->setProperty("stat",1);
     myHLs[1]->setProperty("stat",2);

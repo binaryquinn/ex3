@@ -48,8 +48,8 @@ QList<int> Combatant::armor()
 int Combatant::attack(CombatConstants::Attack attackType, Weapon * selectedWeapon)
 {
     if(attackType == CombatConstants::Withering)
-        return D10::roll(std::max(myDexterity + myCombatAbilities[selectedWeapon->ability()] + selectedWeapon->accuracy() - myHealth.currentPenalty(),0));
-    return D10::roll(std::max(myDexterity + myCombatAbilities[selectedWeapon->ability()]- myHealth.currentPenalty(),0));
+        return D10::roll(std::max(myDexterity + myCombatAbilities[selectedWeapon->ability()] + selectedWeapon->accuracy() + myHealth.currentPenalty(),0));
+    return D10::roll(std::max(myDexterity + myCombatAbilities[selectedWeapon->ability()] + myHealth.currentPenalty(),0));
 }
 
 
@@ -71,7 +71,7 @@ int Combatant::defense(CombatConstants::Defense defenseType, Weapon *weapon, boo
         case CombatConstants::Evasion: value = evasion; break;
         default: value = parryDef; break;
     };
-    value -= myHealth.currentPenalty();
+    value += myHealth.currentPenalty();
     value -= myOnslaught;
     if(onslaught)
         myOnslaught++;

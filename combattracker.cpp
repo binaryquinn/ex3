@@ -50,6 +50,7 @@ void CombatTracker::attack(int attackerIndex, int attackingWeapon, int defenderI
     Combatant *defender = myTargets[defenderIndex];
     Weapon *aWeapon = attacker->weapon(attackingWeapon);
     Weapon *dWeapon = defender->weapon(defendingWeapon);
+    attacker->refreshTurn();
     int attackResult = attacker->attack((CombatConstants::Attack)attackType, aWeapon) - defender->defense((CombatConstants::Defense)defenseType, dWeapon);
 
     if(attackResult > 0)
@@ -64,7 +65,14 @@ void CombatTracker::attack(int attackerIndex, int attackingWeapon, int defenderI
     binaryInsertion(&myNextRound,attacker, 0,myNextRound.count());
     myCurrentRound.removeAt(attackerIndex);
 
-    emit currentRoundChanged();
+    if(myCurrentRound.count() < 1)
+    {
+        myCurrentRound.swap(myNextRound);
+
+
+
+    }
+   emit currentRoundChanged();
     emit nextRoundChanged();
 
     myTargets.clear();
