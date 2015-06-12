@@ -15,7 +15,6 @@ class D10
 {
 public:
     static int roll(int dieCount, bool dblSuccess = true, int dblThreshold = 10 );
-
 };
 
 class Combatant:public QObject
@@ -26,6 +25,8 @@ class Combatant:public QObject
     Q_PROPERTY(int initiative READ initiative NOTIFY initiativeChanged)
     Q_PROPERTY(QList<int> armor READ armor NOTIFY armorChanged)
     Q_PROPERTY(int stamina READ stamina NOTIFY staminaChanged)
+    Q_PROPERTY(QStringList weaponry READ weaponry  NOTIFY weaponryChanged)
+    Q_PROPERTY(QStringList defenseList READ defenseList NOTIFY defensesChanged)
 public:
     explicit Combatant(QObject *parent = 0);
     Combatant(QString name, int dex, int str, int sta, int wit, QObject *parent = 0);
@@ -45,15 +46,19 @@ public:
     void setAbility(QString name, int value);
     Weapon *weapon(int selected);
     void addWeapon(Weapon *addition);
+    QStringList weaponry();
     QString name() const;
 
     int stamina() const;
+    QStringList defenseList();
 
 signals:
     void nameChanged();
     void initiativeChanged();
     void staminaChanged();
     void armorChanged();
+    void weaponryChanged();
+    void defensesChanged();
 
 private:
     QString myName;
@@ -65,7 +70,6 @@ private:
     int myWits;
     QMap<QString,int> myCombatAbilities;
     QList<Weapon *> myPanoply;
-    QList<Weapon *> equippedWeapons;
     int myArmorSoak;
     int myHardness;
     int myMobilityPenalty;

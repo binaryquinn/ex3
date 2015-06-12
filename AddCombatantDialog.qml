@@ -23,12 +23,8 @@ Dialog
         nameField.text = "";
         soakField.text = hardnessField.text=  mpField.text = "";
 
-        healthView.model.set(0,{"hlCount":1});
-        healthView.model.set(1,{"hlCount":2});
-        healthView.model.set(2,{"hlCount":2});
-        healthView.model.set(3,{"hlCount":1});
-        healthView.model.set(4,{"hlCount":1});
 
+        newCombatant.cleanDialog();
         clearWeapons();
     }
 
@@ -103,120 +99,98 @@ Dialog
         Row{
             Repeater {
                 id: attributeRepeater
-                model: Tracker.newCombatantAttributes
+                model: newCombatant.attributes
                 delegate:TraitViewDelegate
                 {
-                id:attributeDelegate
-                traitRatingBox.currentIndex: stat - 1
-                traitRatingBox.model:[1,2,3,4,5]
-            }
-        }
-    }
-}
-
-GroupBox {
-    id: abilityBox
-    anchors.right: parent.horizontalCenter
-    anchors.left: parent.left
-    anchors.leftMargin: 5
-    anchors.top: healthBox.top
-    anchors.bottom: healthBox.bottom
-
-    title: qsTr("Abilities")
-
-    Grid {
-        id: abilityGrid
-        spacing: 5
-        columns: 2
-
-        clip: true
-        Repeater {
-            id: abilityRepeater
-            model:Tracker.newCombatantAbilities
-            delegate: TraitViewDelegate
-            {
-            id:abilityDelegate
-            traitRatingBox.currentIndex: stat
-            traitRatingBox.model: 6
-        }
-    }
-}
-}
-
-GroupBox
-{
-    id:healthBox
-    height: 200
-    title: "Health Levels"
-    anchors.left: parent.horizontalCenter
-    anchors.leftMargin: 5
-    anchors.right: parent.right
-    anchors.rightMargin: 5
-    anchors.top: armorBox.bottom
-    anchors.topMargin: 5
-    ScrollView{
-        width:parent.width
-        height:parent.height
-        ListView {
-            property int longest: 0
-            id: healthView
-            interactive: false
-            height: parent.height - 5
-            delegate:HealthLevelDelegate{
-                parentModel:hlModel
-                hlLabel.width:healthView.longest
-                Component.onCompleted: if(healthView.longest < hlLabel.implicitWidth) healthView.longest = hlLabel.implicitWidth;
-            }
-            model: ListModel {
-                id:hlModel
-                ListElement {
-                    penalty:"0"
-                    hlCount:1
-                }
-                ListElement {
-                    penalty:"-1"
-                    hlCount:2
-                }
-                ListElement {
-                    penalty:"-2"
-                    hlCount:2
-                }
-                ListElement {
-                    penalty:"-4"
-                    hlCount:1
-                }
-                ListElement {
-                    penalty:"Incapacitated"
-                    hlCount:1
+                    id:attributeDelegate
+                    traitRatingBox.currentIndex: stat - 1
+                    traitRatingBox.model:[1,2,3,4,5]
                 }
             }
         }
     }
-}
 
-GroupBox {
-    id: weaponsBox
-    height: 200
-    anchors.rightMargin: 5
-    anchors.leftMargin: 5
-    anchors.topMargin: 4
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: healthBox.bottom
-    anchors.margins: 5
+    GroupBox {
+      id: abilityBox
+        anchors.right: parent.horizontalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: 5
+        anchors.top: healthBox.top
+        anchors.bottom: healthBox.bottom
 
-    title: qsTr("Weapons")
-    Column{
-        id: weaponLayout
-        anchors.top: parent.top
-        anchors.topMargin: 5
-        spacing: 10
+        title: qsTr("Abilities")
 
-        Row {
-            id: weaponTypeRow
-            anchors.horizontalCenter: parent.horizontalCenter
+        Grid {
+            id: abilityGrid
             spacing: 5
-            TextField {
+            columns: 2
+
+            clip: true
+           Repeater {
+                id: abilityRepeater
+                model:newCombatant.abilities
+                delegate: TraitViewDelegate
+                {
+                    id:abilityDelegate
+                    traitRatingBox.currentIndex: stat
+                    traitRatingBox.model: 6
+                }
+            }
+        }
+    }
+
+    GroupBox
+    {
+        id:healthBox
+        height: 200
+        title: "Health Levels"
+        anchors.left: parent.horizontalCenter
+        anchors.leftMargin: 5
+        anchors.right: parent.right
+        anchors.rightMargin: 5
+        anchors.top: armorBox.bottom
+        anchors.topMargin: 5
+        ScrollView{
+            width:parent.width
+            height:parent.height
+            ListView {
+                property int longest: 0
+                id: healthView
+                interactive: false
+                height: parent.height - 5
+                delegate:HealthLevelDelegate{
+                    parentModel:newCombatant.healthLevels
+                    hlLabel.width:healthView.longest
+                    Component.onCompleted: if(healthView.longest < hlLabel.implicitWidth) healthView.longest = hlLabel.implicitWidth;
+                }
+                model:newCombatant.healthLevels
+            }
+        }
+    }
+
+    GroupBox {
+        id: weaponsBox
+        height: 200
+        anchors.rightMargin: 5
+        anchors.leftMargin: 5
+        anchors.topMargin: 4
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: healthBox.bottom
+        anchors.margins: 5
+
+        title: qsTr("Weapons")
+        Column{
+            id: weaponLayout
+            anchors.top: parent.top
+            anchors.topMargin: 5
+            spacing: 10
+
+            Row {
+                id: weaponTypeRow
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 5
+                TextField {
                 id: newWeaponField
                 width:180
                 height: 25
@@ -273,7 +247,7 @@ GroupBox {
                         var range = rangeCombo.currentIndex;
                         var ability = abilityCombo.currentText;
 
-                        Tracker.addWeapon( name,qual,weight,ability,damage,range);
+                        newCombatant.addWeapon( name,qual,weight,ability,damage,range);
 
                         clearWeapons();
                     }
@@ -338,7 +312,7 @@ GroupBox {
             width:weaponsBox.width - 20
             anchors.horizontalCenter: parent.horizontalCenter
 
-            model:Tracker.newCombatantWeapons
+            model:newCombatant.weapons
             TableViewColumn {
                 role: "name"
                 title: "Weapon"
@@ -367,7 +341,7 @@ GroupBox {
 
         }
     }
-}
+    }
 
 Row {
     id: buttonRow
@@ -391,7 +365,7 @@ Row {
             var soak = (soakField.text !== "")? Number(soakField.text) : 0;
             var hardness = (hardnessField.text !== "")? Number(hardnessField.text) : 0;
             var penalty = (mpField.text !== "")? Number(mpField.text) : 0;
-            Tracker.add(nameField.text, soak, hardness, penalty);
+            newCombatant.makeCombatant(nameField.text, soak, hardness, penalty);
 
             accept();
         }
@@ -408,23 +382,23 @@ Row {
     }
 }
 
-states :[
-State{
-    name: "rangedState"
-    when: abilityCombo.currentIndex == 0 || abilityCombo.currentIndex === 4
-    PropertyChanges {
-        target: rangeCombo
-        enabled: true
+    states :[
+        State{
+            name: "rangedState"
+            when: abilityCombo.currentIndex == 0 || abilityCombo.currentIndex === 4
+            PropertyChanges {
+                target: rangeCombo
+                enabled: true
+            }
+        },
+        State{
+            name: "meleeState"
+            when: abilityCombo.currentIndex > 0 && abilityCombo.currentIndex < 4
+            PropertyChanges {
+                target: rangeCombo
+                currentIndex: 0
+            }
+        }
+    ]
     }
-},
-State{
-    name: "meleeState"
-    when: abilityCombo.currentIndex > 0 && abilityCombo.currentIndex < 4
-    PropertyChanges {
-        target: rangeCombo
-        currentIndex: 0
-    }
-}
-]
-}
 }

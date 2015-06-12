@@ -17,7 +17,7 @@ import QtQuick.Controls 1.3
             Label
             {
                 id:hlLabel
-                text:penalty
+                text:name
                 anchors.verticalCenter: hlColumn.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
@@ -31,14 +31,14 @@ import QtQuick.Controls 1.3
                         if(hlRepeater.model< 15)
                         {
                             if(hlRepeater.model>0 &&hlRepeater.model%5 == 0) hlDelegate.height+=21
-                            parentModel.set(index, {"hlCount":hlRepeater.model+1});
+                            parentModel.set(index, {"stat":hlRepeater.model+1});
                         }
                     }
                 onDown:
                     {
                         if(hlRepeater.model > 0)
                         {
-                            parentModel.set(index, {"hlCount":hlRepeater.model-1});
+                            parentModel.set(index, {"stat":hlRepeater.model-1});
                             if(hlRepeater.model%5 == 0 && hlRepeater.model > 0) hlDelegate.height -= 21
                         }
                     }
@@ -54,7 +54,7 @@ import QtQuick.Controls 1.3
                 Repeater
                 {
                     id:hlRepeater
-                    model:hlCount
+                    model:stat
                     Image {
                         id: image1
                         width: 18

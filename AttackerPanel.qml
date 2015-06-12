@@ -2,34 +2,12 @@ import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.0
 
-Item {
+Item{
     id: item1
     width: 600
     height: 250
 
-
-    ListModel {
-        id:tempModel
-        ListElement {
-            name: "Grey"
-            colorCode: "grey"
-        }
-
-        ListElement {
-            name: "Red"
-            colorCode: "red"
-        }
-
-        ListElement {
-            name: "Blue"
-            colorCode: "blue"
-        }
-
-        ListElement {
-            name: "Green"
-            colorCode: "green"
-        }
-    }
+    enabled: Tracker.inBattle
 
     Component
     {
@@ -47,7 +25,7 @@ Item {
 
     }
 
-    Label {
+    Label{
         id: nameLabel
         text: (Tracker.currentRound[0] !== undefined)? qsTr("Name: ") + Tracker.currentRound[0].name : qsTr("Name: ")
         anchors.right: parent.right
@@ -58,7 +36,7 @@ Item {
         anchors.topMargin: 10
     }
 
-    Label {
+    Label{
         id: initiativeLabel
         text: (Tracker.currentRound[0] !== undefined)? qsTr("Initiave: ") + Tracker.currentRound[0].initiative : qsTr("Initiave: ")
         anchors.top: nameLabel.bottom
@@ -67,7 +45,7 @@ Item {
         anchors.leftMargin: 10
     }
 
-    Label {
+    Label{
         id: nSoakLabel
         text: (Tracker.currentRound[0] !== undefined)? qsTr("Natural Soak: ") + Tracker.currentRound[0].stamina : qsTr("Natural Soak: ")
         anchors.top: initiativeLabel.bottom
@@ -76,7 +54,7 @@ Item {
         anchors.leftMargin: 10
     }
 
-    Label {
+    Label{
         id: aSoakLabel
         x: 111
         text: (Tracker.currentRound[0] !== undefined)? qsTr("Armor Soak: ") + Tracker.currentRound[0].armor[0] : qsTr("Armor Soak: ")
@@ -84,7 +62,7 @@ Item {
         anchors.topMargin: 0
     }
 
-    Label {
+    Label{
         id: totalSoakLabel
         x: 220
         text: (Tracker.currentRound[0] !== undefined)? qsTr("Total Soak: ") + (Tracker.currentRound[0].armor[0] + Tracker.currentRound[0].stamina) : qsTr("Total Soak: ")
@@ -92,7 +70,7 @@ Item {
         anchors.topMargin: 0
     }
 
-    Label {
+    Label{
         id: doWhatLabel
         x: 28
         y: 150
@@ -102,7 +80,7 @@ Item {
         anchors.horizontalCenter: doWhatScroll.horizontalCenter
     }
 
-    ScrollView {
+    ScrollView{
         id: doWhatScroll
         width: (item1.width/3)-40
         anchors.bottom: parent.bottom
@@ -112,10 +90,10 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: 10
 
-        ListView {
+        ListView{
             id: doWhatView
             anchors.fill: parent
-            delegate: Item {
+            delegate: Item{
                 x: 5
                 width: parent.width
                 height: 40
@@ -124,15 +102,16 @@ Item {
                         onClicked: {
                             doWhatView.currentIndex = index;
                         }
-                    Label{
-                        text: modelData
-                        font.bold: true
-                        anchors.verticalCenter: parent.verticalCenter
+                        Label{
+                            text: modelData
+                            font.bold: true
+                            anchors.verticalCenter: parent.verticalCenter
 
                        }
                 }
             }
             model:Tracker.actions
+            onModelChanged: currentIndex = -1;
             highlight: highlightBar
             Component.onCompleted: currentIndex = -1;
         }
@@ -140,38 +119,41 @@ Item {
 
 
 
-    Label {
+    Label{
         id: toWhomLabel
         x: 169
         y: 150
         text: qsTr("To Whom?")
-        anchors.bottom: rectangle2.top
+        anchors.bottom: toWhomScroll.top
         anchors.bottomMargin: 5
-        anchors.horizontalCenter: rectangle2.horizontalCenter
+        anchors.horizontalCenter: toWhomScroll.horizontalCenter
     }
 
 
     ScrollView{
-        id: rectangle2
-        x: 138
+        id: toWhomScroll
         width: doWhatScroll.width
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.left: doWhatScroll.right
+        anchors.leftMargin: 10
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.top: parent.verticalCenter
         anchors.topMargin: 0
 
-        ListView {
-            id: listView2
+        ListView{
+            id: toWhomView
             anchors.fill: parent
             delegate: Item {
                 x: 5
-                width: 80
+                width: parent.width
                 height: 40
-                Row {
-                    id: row2
-                    spacing: 10
-                    Text {
+
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        toWhomView.currentIndex = index;
+                    }
+                    Label{
                         text: name
                         font.bold: true
                         anchors.verticalCenter: parent.verticalCenter
@@ -179,58 +161,106 @@ Item {
                 }
             }
             model:Tracker.targets
+            onModelChanged:
+            {
+                doWhatView.currentIndex = -1;
+                currentIndex = -1;
+                withWhatView.currentIndex = -1;
+            }
+            highlight: highlightBar
+            Component.onCompleted: currentIndex = -1;
+
         }
     }
 
 
-    Label {
+    Label{
         id: withWhatlabel
         x: 299
         y: 150
         text: qsTr("With What?")
-        anchors.bottom: rectangle3.top
+        anchors.bottom: withWhatScroll.top
         anchors.bottomMargin: 5
-        anchors.horizontalCenter: rectangle3.horizontalCenter
+        anchors.horizontalCenter: withWhatScroll.horizontalCenter
     }
 
-    ScrollView {
-        id: rectangle3
-        x: 272
+    ScrollView{
+        id: withWhatScroll
         width: doWhatScroll.width
-        anchors.right: parent.right
-        anchors.rightMargin: 10
+        anchors.left: toWhomScroll.right
+        anchors.leftMargin: 10
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.top: parent.verticalCenter
         anchors.topMargin: 0
 
-        ListView {
-            id: listView3
+        ListView{
+            id: withWhatView
             anchors.fill: parent
             delegate: Item {
                 x: 5
-                width: 80
+                width: parent.width
                 height: 40
-                Row {
-                    id: row3
-                    spacing: 10
-                    Rectangle {
-                        width: 40
-                        height: 40
-                        color: colorCode
-                    }
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            withWhatView.currentIndex = index;
+                        }
+                        Label{
+                            text: modelData
+                            font.bold: true
+                            anchors.verticalCenter: parent.verticalCenter
 
-                    Text {
-                        text: name
-                        font.bold: true
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                       }
                 }
             }
-            model:tempModel
+            model:(Tracker.currentRound[0] !== undefined)? Tracker.currentRound[0].weaponry : 0
+            onModelChanged: currentIndex = -1;
+            highlight: highlightBar
+            Component.onCompleted: currentIndex = -1;
+
         }
     }
 
+    Button {
+        id: commitButton
+        y: 171
+        text: qsTr("Commit")
+        anchors.verticalCenter: withWhatScroll.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        anchors.left: withWhatScroll.right
+        anchors.leftMargin: 10
+
+        enabled: (doWhatView.currentIndex > -1)&&(toWhomView.currentIndex > -1)&&(withWhatView.currentIndex > -1)
+        onClicked:
+        {
+
+
+            defenderDialog.model = Tracker.targets[toWhomView.currentIndex].defenseList;
+            defenderDialog.open();
+        }
+    }
+
+    DefenderChoiceDialog
+    {
+        id:defenderDialog
+        width: 300
+        height: 300
+        onAccepted:
+        {
+
+            var attacker = 0;
+            var aWeapon = withWhatView.currentIndex;
+            var defender = toWhomView.currentIndex;
+            var dWeapon = (defenderDialog.choice==0)? 0 : (defenderDialog.choice-1);
+            var aType = (doWhatView.currentIndex== 0)? 0 : 1;
+            var dType = (defenderDialog.choice==0)? 1: 2;
+            Tracker.attack(attacker, aWeapon, defender, dWeapon, aType, dType);
+        }
+
+
+    }
 }
 
 

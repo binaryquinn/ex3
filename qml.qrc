@@ -6,6 +6,7 @@
         <file>UpDownColumn.qml</file>
         <file>HealthLevelDelegate.qml</file>
         <file>TraitViewDelegate.qml</file>
+        <file>DefenderChoiceDialog.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>square-empty.png</file>

@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QStringList>
-Q_DECLARE_METATYPE(QStringList)
 
+Q_DECLARE_METATYPE(QStringList)
 class CombatConstants: public QObject
 {
 
@@ -36,6 +36,10 @@ public slots:
     static QStringList damageTypes();
     static QStringList attributes();
 
+signals:
+    void combatAbilitiesChanged();
+    void allAbilitiesChanged();
+    void rangesChanged();
 
 private:
     static QStringList myAttackAbilities;

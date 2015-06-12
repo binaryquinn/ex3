@@ -2,12 +2,7 @@
 
 CombatTracker::CombatTracker(QObject *parent) : QObject(parent)
 {
-    foreach(QString ability,CombatConstants::allAbilities())
-        myDialogAbilities.append(new TraitRating(ability,0));
-
-    foreach(QString attributes,CombatConstants::attributes())
-        myDialogAttributes.append(new TraitRating(attributes,1));
-
+    battleStarted = false;
     myActionList  << "Attack (Withering)" << "Attack (Decisive)" << "Full Defense" << "Defend Other" << "Miscellaeneous Attack";
 }
 
@@ -22,7 +17,7 @@ void CombatTracker::addCombatant(Combatant *add)
 
     QList<Combatant *> *host;
 
-    if(!inBattle)
+    if(!battleStarted)
         host = &myCurrentRound;
     else
         host = &myNextRound;
@@ -34,7 +29,7 @@ void CombatTracker::addCombatant(Combatant *add)
     else
        binaryInsertion(host,add,0,host->count());
 
-    if(!inBattle) emit currentRoundChanged();
+    if(!battleStarted) emit currentRoundChanged();
     else emit nextRoundChanged();
 
     myTargets.clear();
@@ -49,18 +44,40 @@ void CombatTracker::addCombatant(Combatant *add)
 
 }
 
-void CombatTracker::attack(Combatant *attacker, int attackingWeapon, Combatant *defender, int defendingWeapon, CombatConstants::Attack attackType, CombatConstants::Defense defenseType)
+void CombatTracker::attack(int attackerIndex, int attackingWeapon, int defenderIndex, int defendingWeapon, int attackType, int defenseType)
 {
+    Combatant *attacker = myCurrentRound[attackerIndex];
+    Combatant *defender = myTargets[defenderIndex];
     Weapon *aWeapon = attacker->weapon(attackingWeapon);
     Weapon *dWeapon = defender->weapon(defendingWeapon);
-    int attackResult = attacker->attack(attackType, aWeapon) - defender->defense(defenseType, dWeapon);
+    int attackResult = attacker->attack((CombatConstants::Attack)attackType, aWeapon) - defender->defense((CombatConstants::Defense)defenseType, dWeapon);
 
     if(attackResult > 0)
     {
-        int damagePool = attacker->damage(attackType, aWeapon) + (attackType == CombatConstants::Withering) ? attackResult : 0;
-        defender->takeDamage(attackType,damagePool,aWeapon->overwhelming(),aWeapon->woundType());
-        attacker->resetInitiative();
+        int damagePool = attacker->damage((CombatConstants::Attack)attackType, aWeapon) + (attackType == CombatConstants::Withering)? attackResult : 0;
+        int damageResult = defender->takeDamage((CombatConstants::Attack)attackType,damagePool,aWeapon->overwhelming(),aWeapon->woundType());
+        if((CombatConstants::Attack)attackType == CombatConstants::Withering)
+            attacker->changeInitiative(1+damageResult);
+        else
+            attacker->resetInitiative();
     }
+    binaryInsertion(&myNextRound,attacker, 0,myNextRound.count());
+    myCurrentRound.removeAt(attackerIndex);
+
+    emit currentRoundChanged();
+    emit nextRoundChanged();
+
+    myTargets.clear();
+    myTargets.append(myCurrentRound);
+    myTargets.append(myNextRound);
+    if(myTargets.count() > 1)
+    {
+        myTargets.removeFirst();
+        emit targetsChanged();
+        emit actionsChanged();
+    }
+
+
 }
 
 QQmlListProperty<Combatant> CombatTracker::currentRound()
@@ -76,21 +93,6 @@ QQmlListProperty<Combatant> CombatTracker::nextRound()
 QQmlListProperty<Combatant> CombatTracker::validTargets()
 {
     return QQmlListProperty<Combatant>(this,myTargets);
-}
-
-QQmlListProperty<TraitRating> CombatTracker::newCombatantAttributes()
-{
-    return QQmlListProperty<TraitRating>(this,myDialogAttributes);
-}
-
-QQmlListProperty<TraitRating> CombatTracker::newCombatantAbilities()
-{
-    return QQmlListProperty<TraitRating>(this,myDialogAbilities);
-}
-
-QQmlListProperty<Weapon> CombatTracker::newCombatantWeapons()
-{
-    return QQmlListProperty<Weapon>(this, myDialogWeapons);
 }
 
 QStringList CombatTracker::actions()
@@ -114,54 +116,21 @@ QStringList CombatTracker::actions()
     return QStringList();
 }
 
-void CombatTracker::add(QString name, int soak,int hardness, int penalty )
+bool CombatTracker::inBattle()
 {
-    int str = myDialogAttributes[0]->property("stat").toInt();
-    int dex = myDialogAttributes[1]->property("stat").toInt();
-    int sta = myDialogAttributes[2]->property("stat").toInt();
-    int wit = myDialogAttributes[3]->property("stat").toInt();
-    Combatant * newbie = new Combatant(name,dex,str,sta,wit);
-    newbie->setArmor(soak,hardness,penalty);
-
-    foreach (TraitRating* trait, myDialogAbilities)
-        newbie->setAbility(trait->property("name").toString(),trait->property("stat").toInt());
-
-    foreach (Weapon * wep, myDialogWeapons)
-        newbie->addWeapon(wep);
-
-    addCombatant(newbie);
+    return battleStarted;
 }
-
-void CombatTracker::addWeapon(QString name, int qual, int weight, QString ability, int damage, int range)
-{
-    myDialogWeapons.append(new Weapon(name,(Weapon::Quality)qual,(Weapon::WeightClass)weight, ability, (CombatConstants::Wounds)damage, (CombatConstants::Range)range));
-    emit weaponsChanged();
-}
-
-void CombatTracker::cleanDialog()
-{
-    int cleaner = 0;
-
-    for(;cleaner < myDialogAttributes.count();cleaner++)
-        myDialogAttributes[cleaner]->setProperty("stat",1);
-
-    for(cleaner = 0;cleaner < myDialogAbilities.count();cleaner++)
-        myDialogAbilities[cleaner]->setProperty("stat",0);
-
-    myDialogWeapons.clear();
-
-    emit attributesChanged();
-    emit abilitiesChanged();
-    emit weaponsChanged();
-
-}
-
 
 void CombatTracker::binaryInsertion(QList<Combatant *> *host, Combatant* add, int left, int right)
 {
     int mid = (left+right)/2;
-    if (right <= left)
-        host->insert(mid,add);
+    if (right <= left )
+    {
+        if( mid + 1 < host->count() && add->initiative() < host->at(mid)->initiative())
+            host->insert(mid+1,add);
+        else
+            host->insert(mid,add);
+    }
     else
     {
         if (add->initiative() < host->at(mid)->initiative())
@@ -172,12 +141,3 @@ void CombatTracker::binaryInsertion(QList<Combatant *> *host, Combatant* add, in
 }
 
 
-TraitRating::TraitRating(QObject *parent):QObject(parent), myName(""), myRating(0)
-{
-
-}
-
-TraitRating::TraitRating(QString name, unsigned int rating, QObject *parent):QObject(parent), myName(name), myRating(rating)
-{
-
-}
