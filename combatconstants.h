@@ -14,12 +14,14 @@ class CombatConstants: public QObject
     Q_ENUMS(Defense)
     Q_ENUMS(Range)
     Q_ENUMS(Hands)
+    Q_ENUMS(Rounds)
     Q_PROPERTY(QStringList combatAbilities READ combatAbilities CONSTANT)
     Q_PROPERTY(QStringList allAbilities READ allAbilities CONSTANT)
     Q_PROPERTY(QStringList ranges READ ranges CONSTANT)
     Q_PROPERTY(QStringList damageTypes READ damageTypes CONSTANT)
     Q_PROPERTY(QStringList attributes READ attributes CONSTANT)
-
+    Q_PROPERTY(QStringList units READ units CONSTANT)
+    Q_PROPERTY(QStringList verbs READ verbs CONSTANT)
 
 public:
 
@@ -28,6 +30,8 @@ public:
     enum Defense{Overall, Evasion, Parry};
     enum Range{Close, Short, Medium, Long, Extreme};
     enum Hands{Left, Right, Both};
+    enum Rounds{Current, Next};
+
 
 public slots:
     static QStringList combatAbilities();
@@ -35,6 +39,8 @@ public slots:
     static QStringList ranges();
     static QStringList damageTypes();
     static QStringList attributes();
+    static QStringList units();
+    static QStringList verbs();
 
 signals:
     void combatAbilitiesChanged();
@@ -47,6 +53,8 @@ private:
     static QStringList myRanges;
     static QStringList myDamageTypes;
     static QStringList myAttributes;
+    static QStringList myUnits;
+    static QStringList myVerbs;
 
 };
 

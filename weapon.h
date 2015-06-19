@@ -76,7 +76,7 @@ private:
     static QMap<Quality, QMap< QString, QMap<CombatConstants::Range, int> > > rangeBands;
     static QStringList myWeaponTraits;
     static QStringList myQualities;
-    static QStringList myWeightClases;
+    static QStringList myWeightClasses;
 
     void initialize();
 };

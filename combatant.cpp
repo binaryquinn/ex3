@@ -47,9 +47,10 @@ QList<int> Combatant::armor()
 
 int Combatant::attack(CombatConstants::Attack attackType, Weapon * selectedWeapon)
 {
+    int attackBase = myDexterity + myCombatAbilities[selectedWeapon->ability()] + myHealth.currentPenalty();
     if(attackType == CombatConstants::Withering)
-        return D10::roll(std::max(myDexterity + myCombatAbilities[selectedWeapon->ability()] + selectedWeapon->accuracy() + myHealth.currentPenalty(),0));
-    return D10::roll(std::max(myDexterity + myCombatAbilities[selectedWeapon->ability()] + myHealth.currentPenalty(),0));
+        return D10::roll(std::max(attackBase+ selectedWeapon->accuracy(), 0));
+    return D10::roll(std::max(attackBase,0));
 }
 
 
@@ -82,14 +83,17 @@ int Combatant::defense(CombatConstants::Defense defenseType, Weapon *weapon, boo
 void Combatant::refreshTurn()
 {
     myOnslaught = 0;
+    if(myCrashGuard > 0)
+        myCrashGuard--;
     if(myCrashCounter == 3)
+    {
         resetInitiative();
+        myCrashGuard = 2;
+    }
     if(myInitiative < 1)
         myCrashCounter++;
     else
         myCrashCounter = 0;
-
-
 }
 
 void Combatant::resetInitiative()
@@ -101,8 +105,14 @@ void Combatant::resetInitiative()
 
 void Combatant::changeInitiative(int value)
 {
-    myInitiative += value;
-    emit initiativeChanged();
+    if(value != 0)
+    {
+        int guardCheck = myInitiative;
+        myInitiative += value;
+        emit initiativeChanged();
+        if(guardCheck < 1 && myInitiative > 0)
+            myCrashGuard = 2;
+    }
 }
 
 int Combatant::initiative()
@@ -110,19 +120,28 @@ int Combatant::initiative()
     return myInitiative;
 }
 
+void Combatant::suffer(int amount, CombatConstants::Wounds damageType)
+{
+    myHealth.takeDamage(amount, damageType);
+}
+
+
 int Combatant::takeDamage(CombatConstants::Attack attackType, int damage, int overwhelming, CombatConstants::Wounds damageType)
 {
 
 
     if(attackType == CombatConstants::Withering)
     {
-       int postSoak = damage - (myStamina + myArmorSoak); //calculating dice pool
-       if(postSoak < overwhelming)
-           postSoak = overwhelming;
-       postSoak = D10::roll(postSoak); //dice pool becomes dice successes
-       myInitiative -= postSoak;
-       emit initiativeChanged();
-       return postSoak;
+        int postSoak = damage - (myStamina + myArmorSoak); //calculating dice pool
+        if(postSoak < overwhelming)
+            postSoak = overwhelming;
+        postSoak = D10::roll(postSoak); //dice pool becomes dice successes
+        int crashCheck = myInitiative;
+        myInitiative -= postSoak;
+        emit initiativeChanged();
+        if(crashCheck > 0 && myInitiative < 1 && myCrashGuard < 1)
+            postSoak+=5;
+        return postSoak;
     }
     else
     {
@@ -190,16 +209,49 @@ QStringList Combatant::defenseList()
 void Combatant::initialize()
 {
 
-    myOnslaught = 0;
+    myOnslaught = myCrashCounter = myCrashGuard = 0;
     QStringList abilist = CombatConstants::allAbilities();
     foreach(QString ability , abilist)
         myCombatAbilities.insert(ability,0);
+    myActionList  << "Attack (Withering)" << "Attack (Decisive)" << "Full Defense" << "Delay Action" << "Miscellaeneous Attack";
+    connect(&myHealth,&HealthTrack::penaltyChanged, this, &Combatant::penaltyChanged);
 }
 
 int Combatant::parryDefense(Weapon *weapon)
 {
     int ability = myCombatAbilities.contains(weapon->ability()) ? myCombatAbilities[weapon->ability()] : 0;
     return ceil((double)(myDexterity + ability)/2) + weapon->defense();
+}
+
+int Combatant::woundPenalty()
+{
+    return myHealth.currentPenalty();
+}
+
+bool Combatant::isIncapacitated()
+{
+    return myHealth.isIncapacitated();
+}
+
+bool Combatant::isDead()
+{
+    return myHealth.isDead();
+}
+
+QStringList Combatant::actions()
+{
+    if(myHealth.isIncapacitated())
+        return QStringList();
+    if(initiative() > 0 && myActionList.count() == 4)
+    {
+        myActionList.insert(1,"Attack (Decisive)");
+    }
+    else if(initiative() < 1 && myActionList.count() == 5)
+    {
+        myActionList.removeAt(1);
+    }
+
+    return myActionList;
 }
 
 int D10::roll(int dieCount, bool dblSuccess, int dblThreshold)
@@ -212,12 +264,15 @@ int D10::roll(int dieCount, bool dblSuccess, int dblThreshold)
 
         dieValue = (std::rand()%10)+1;
         if(dieValue > 6 )
-            successes++;
-        if(dblSuccess)
         {
-            if(dieValue >= dblThreshold)
-                successes++;
+            successes++;
+            if(dblSuccess)
+            {
+                if(dieValue >= dblThreshold)
+                    successes++;
+            }
         }
     }
     return successes;
 }
+

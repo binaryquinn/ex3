@@ -27,6 +27,9 @@ class Combatant:public QObject
     Q_PROPERTY(int stamina READ stamina NOTIFY staminaChanged)
     Q_PROPERTY(QStringList weaponry READ weaponry  NOTIFY weaponryChanged)
     Q_PROPERTY(QStringList defenseList READ defenseList NOTIFY defensesChanged)
+    Q_PROPERTY(int woundPenalty READ woundPenalty NOTIFY penaltyChanged)
+    Q_PROPERTY(QStringList actions READ actions NOTIFY actionsChanged)
+
 public:
     explicit Combatant(QObject *parent = 0);
     Combatant(QString name, int dex, int str, int sta, int wit, QObject *parent = 0);
@@ -42,6 +45,7 @@ public:
     void resetInitiative();
     void changeInitiative(int value);
     int initiative();
+    void suffer(int amount, CombatConstants::Wounds damageType);
     int takeDamage(CombatConstants::Attack attackType, int damage, int overwhelming, CombatConstants::Wounds damageType);
     void setAbility(QString name, int value);
     Weapon *weapon(int selected);
@@ -51,6 +55,10 @@ public:
 
     int stamina() const;
     QStringList defenseList();
+    int woundPenalty();
+    bool isIncapacitated();
+    bool isDead();
+    QStringList actions();
 
 signals:
     void nameChanged();
@@ -59,6 +67,8 @@ signals:
     void armorChanged();
     void weaponryChanged();
     void defensesChanged();
+    void penaltyChanged();
+    void actionsChanged();
 
 private:
     QString myName;
@@ -74,11 +84,11 @@ private:
     int myHardness;
     int myMobilityPenalty;
     int myOnslaught;
-
     int myCrashCounter;
+    QStringList myActionList;
     void initialize();
     int parryDefense(Weapon *weapon);
-
+    int myCrashGuard;
 };
 
 #endif // COMBATANT_H

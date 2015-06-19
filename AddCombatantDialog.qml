@@ -243,7 +243,7 @@ Dialog
 
                         var qual = qualityCombo.currentIndex;
                         var weight = weightClassCombo.currentIndex;
-                        var damage = dmgTypeCombo.currentIndex;
+                        var damage = dmgTypeCombo.currentIndex+1;
                         var range = rangeCombo.currentIndex;
                         var ability = abilityCombo.currentText;
 

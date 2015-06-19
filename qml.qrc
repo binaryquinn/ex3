@@ -7,11 +7,15 @@
         <file>HealthLevelDelegate.qml</file>
         <file>TraitViewDelegate.qml</file>
         <file>DefenderChoiceDialog.qml</file>
+        <file>InputDialog.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>square-empty.png</file>
         <file>Down.png</file>
         <file>Up.png</file>
+        <file>square-asterisk.png</file>
+        <file>square-slash.png</file>
+        <file>square-x.png</file>
     </qresource>
     <qresource prefix="/defaults">
         <file>ranges.xml</file>

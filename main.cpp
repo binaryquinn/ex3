@@ -8,7 +8,7 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-
+    QQmlApplicationEngine engine;
     qmlRegisterType<Combatant>("Model", 1, 0, "Combatant");
     qmlRegisterType<TraitRating>("Model", 1, 0, "TraitRating");
     qmlRegisterType<Weapon>("Model", 1, 0, "Weapon");
@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
     NewCombatantDialog *myDialog = new NewCombatantDialog(&app);
 
     QObject::connect(myDialog, &NewCombatantDialog::combatantMade, myTracker, &CombatTracker::addCombatant);
-            std::srand(QTime::currentTime().msec());
-    QQmlApplicationEngine engine;
+    std::srand(QTime::currentTime().msec());
+
     engine.rootContext()->setContextProperty("Tracker", myTracker);
     engine.rootContext()->setContextProperty("newCombatant", myDialog);
     engine.rootContext()->setContextProperty("Constants", new CombatConstants());

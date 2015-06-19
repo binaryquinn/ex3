@@ -70,6 +70,15 @@ Item{
         anchors.topMargin: 0
     }
 
+    Label {
+        id: woundLabel
+        text: (Tracker.currentRound[0] !== undefined)? qsTr("Wound Penalty: ") + Tracker.currentRound[0].woundPenalty : qsTr("Wound Penalty: 0")
+        anchors.top: nSoakLabel.bottom
+        anchors.topMargin: 5
+        anchors.left: parent.left
+        anchors.leftMargin: 10
+    }
+
     Label{
         id: doWhatLabel
         x: 28
@@ -92,6 +101,7 @@ Item{
 
         ListView{
             id: doWhatView
+            visible: false
             anchors.fill: parent
             delegate: Item{
                 x: 5
@@ -110,7 +120,7 @@ Item{
                        }
                 }
             }
-            model:Tracker.actions
+            model:(Tracker.currentRound[0] !== undefined)? Tracker.currentRound[0].actions : 0;
             onModelChanged: currentIndex = -1;
             highlight: highlightBar
             Component.onCompleted: currentIndex = -1;
@@ -187,6 +197,7 @@ Item{
     ScrollView{
         id: withWhatScroll
         width: doWhatScroll.width
+        visible: false
         anchors.left: toWhomScroll.right
         anchors.leftMargin: 10
         anchors.bottom: parent.bottom
@@ -232,13 +243,19 @@ Item{
         anchors.left: withWhatScroll.right
         anchors.leftMargin: 10
 
-        enabled: (doWhatView.currentIndex > -1)&&(toWhomView.currentIndex > -1)&&(withWhatView.currentIndex > -1)
+        enabled: (toWhomView.currentIndex > -1)//(doWhatView.currentIndex > -1)&& &&(withWhatView.currentIndex > -1)
         onClicked:
         {
+            actionDialog.defenderIndex = toWhomView.currentIndex
+            actionDialog.attackerName = Tracker.currentRound[0].name;
+            actionDialog.defenderName =  Tracker.targets[toWhomView.currentIndex].name;
+            actionDialog.open();
 
-
-            defenderDialog.model = Tracker.targets[toWhomView.currentIndex].defenseList;
-            defenderDialog.open();
+//            if(Tracker.currentRound[0].actions[doWhatView.currentIndex].contains("Attack"))
+//            {
+//                defenderDialog.model = Tracker.targets[toWhomView.currentIndex].defenseList;
+//                defenderDialog.open();
+//            }
         }
     }
 
@@ -258,9 +275,22 @@ Item{
             var dType = (defenderDialog.choice==0)? 1: 2;
             Tracker.attack(attacker, aWeapon, defender, dWeapon, aType, dType);
         }
+    }
 
+    InputDialog
+    {
+        id: actionDialog
+        width: 400
+        height: 200
+        onAccepted:
+        {
+            Tracker.modifyCombatant(0, true, attackerUnit, attackerAmount*attackerDirection, attackerDone);
+            Tracker.modifyCombatant(defenderIndex, false, defenderUnit, defenderAmount * defenderDirection, false);
+        }
 
     }
+
+
 }
 
 

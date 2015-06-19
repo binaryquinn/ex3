@@ -5,6 +5,8 @@ QStringList CombatConstants::myOtherAbilities;
 QStringList CombatConstants::myRanges;
 QStringList CombatConstants::myDamageTypes;
 QStringList CombatConstants::myAttributes;
+QStringList CombatConstants::myUnits;
+QStringList CombatConstants::myVerbs;
 
 QStringList CombatConstants::combatAbilities()
 {
@@ -52,4 +54,22 @@ QStringList CombatConstants::attributes()
         myAttributes << "Strength" << "Dexterity" << "Stamina" << "Wits";
     }
     return myAttributes;
+}
+
+QStringList CombatConstants::units()
+{
+    if(myUnits.empty())
+    {
+        myUnits << "Initiative" << damageTypes();
+    }
+    return myUnits;
+}
+
+QStringList CombatConstants::verbs()
+{
+    if(myVerbs.empty())
+    {
+        myVerbs << "Gains" << "Loses";
+    }
+    return myVerbs;
 }

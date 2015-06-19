@@ -8,9 +8,9 @@ QMap<Weapon::Quality , QMap< Weapon::WeightClass, QMap<Weapon::WeaponTrait, int>
 QStringList Weapon::myWeaponTraits;
 QMap<Weapon::Quality , QMap<QString, QMap<CombatConstants::Range, int> > > Weapon::rangeBands;
 QStringList Weapon::myQualities;
-QStringList Weapon::myWeightClases;
+QStringList Weapon::myWeightClasses;
 
-Weapon::Weapon(QObject *parent):QObject(parent), myQuality(Weapon::Mundane), myWeight(Weapon::Light), myAbility(""),  myWoundType(CombatConstants::Bashing), myRange(CombatConstants::Close), myStrength(false), myHanded(false)
+Weapon::Weapon(QObject *parent):QObject(parent), myQuality(Weapon::Mundane), myWeight(Weapon::Light), myAbility(""),  myWoundType(CombatConstants::Bashing), myRange(CombatConstants::Close), myStrength(true), myHanded(false)
 {
     if(stats.empty())
         initialize();
@@ -42,7 +42,7 @@ int Weapon::damage() const
 int Weapon::defense() const
 {
     if((myAbility != "Archery") && (myAbility!="Thrown"))
-        return stats[myQuality][myWeight][Weapon::Accuracy];
+        return stats[myQuality][myWeight][Weapon::Defense];
     else return INT_MIN;
 }
 
@@ -111,11 +111,11 @@ QStringList Weapon::qualities()
 
 QStringList Weapon::weightClasses()
 {
-    if(myWeightClases.empty())
+    if(myWeightClasses.empty())
     {
-        myWeightClases << "Light" << "Medium" << "Heavy";
+        myWeightClasses << "Light" << "Medium" << "Heavy";
     }
-    return myWeightClases;
+    return myWeightClasses;
 }
 
 QStringList Weapon::weaponTraits()
