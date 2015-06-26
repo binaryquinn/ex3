@@ -8,7 +8,6 @@ import QtQuick.Controls 1.3
         property alias hlLabel:hlLabel
 
         id:hlDelegate
-        x: 5
         height: 35
         Row{
             id: row2
@@ -21,7 +20,6 @@ import QtQuick.Controls 1.3
                 anchors.verticalCenter: hlColumn.verticalCenter
                 horizontalAlignment: Text.AlignRight
                 verticalAlignment: Text.AlignVCenter
-
             }
             UpDownColumn
             {
@@ -30,15 +28,15 @@ import QtQuick.Controls 1.3
                     {
                         if(hlRepeater.model< 15)
                         {
-                            if(hlRepeater.model>0 &&hlRepeater.model%5 == 0) hlDelegate.height+=21
-                            parentModel.set(index, {"stat":hlRepeater.model+1});
+                            if(hlRepeater.model>0 &&hlRepeater.model%5 == 0) hlDelegate.height += 21
+                            parentModel[index].stat = hlRepeater.model + 1
                         }
                     }
                 onDown:
                     {
                         if(hlRepeater.model > 0)
                         {
-                            parentModel.set(index, {"stat":hlRepeater.model-1});
+                            parentModel[index].stat = hlRepeater.model - 1;
                             if(hlRepeater.model%5 == 0 && hlRepeater.model > 0) hlDelegate.height -= 21
                         }
                     }

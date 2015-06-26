@@ -22,8 +22,6 @@ Dialog
     {
         nameField.text = "";
         soakField.text = hardnessField.text=  mpField.text = "";
-
-
         newCombatant.cleanDialog();
         clearWeapons();
     }
@@ -35,8 +33,6 @@ Dialog
         id: item2
         width: 600
         height: 560
-
-
 
         TextField {
             id: nameField
@@ -96,15 +92,19 @@ Dialog
         }
         width:nameField.width
         title: qsTr("Attributes")
-        Row{
+        RowLayout{
             Repeater {
                 id: attributeRepeater
+                property int longest: 0
                 model: newCombatant.attributes
+
                 delegate:TraitViewDelegate
                 {
                     id:attributeDelegate
                     traitRatingBox.currentIndex: stat - 1
                     traitRatingBox.model:[1,2,3,4,5]
+                    traitLabel.width:attributeRepeater.longest
+                    Component.onCompleted: if(attributeRepeater.longest < traitLabel.implicitWidth) attributeRepeater.longest = traitLabel.implicitWidth;
                 }
             }
         }
@@ -120,13 +120,13 @@ Dialog
 
         title: qsTr("Abilities")
 
-        Grid {
+        GridLayout {
+            anchors.fill: parent
             id: abilityGrid
-            spacing: 5
+            columnSpacing: 5
             columns: 2
-
-            clip: true
            Repeater {
+               property int longest: 0
                 id: abilityRepeater
                 model:newCombatant.abilities
                 delegate: TraitViewDelegate
@@ -134,6 +134,8 @@ Dialog
                     id:abilityDelegate
                     traitRatingBox.currentIndex: stat
                     traitRatingBox.model: 6
+                    traitLabel.width:abilityRepeater.longest
+                    Component.onCompleted: if(abilityRepeater.longest < traitLabel.implicitWidth) abilityRepeater.longest = traitLabel.implicitWidth;
                 }
             }
         }
@@ -142,22 +144,21 @@ Dialog
     GroupBox
     {
         id:healthBox
-        height: 200
+        height: 3 * item2.height/8
         title: "Health Levels"
         anchors.left: parent.horizontalCenter
-        anchors.leftMargin: 5
         anchors.right: parent.right
-        anchors.rightMargin: 5
+
         anchors.top: armorBox.bottom
-        anchors.topMargin: 5
-        ScrollView{
-            width:parent.width
-            height:parent.height
+        anchors.margins: 10
+
+    ScrollView{
+            anchors.fill: parent
+
             ListView {
                 property int longest: 0
                 id: healthView
                 interactive: false
-                height: parent.height - 5
                 delegate:HealthLevelDelegate{
                     parentModel:newCombatant.healthLevels
                     hlLabel.width:healthView.longest
@@ -170,14 +171,14 @@ Dialog
 
     GroupBox {
         id: weaponsBox
-        height: 200
-        anchors.rightMargin: 5
-        anchors.leftMargin: 5
-        anchors.topMargin: 4
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: healthBox.bottom
-        anchors.margins: 5
+
+    anchors.bottom: buttonRow.top
+    anchors.margins: 10
+
 
         title: qsTr("Weapons")
         Column{
@@ -308,7 +309,7 @@ Dialog
 
         TableView{
             id: weaponsView
-            height: 100
+            height: weaponsBox.height - (weaponStatRow.y + weaponStatRow.height + (2 * (weaponLayout.spacing + weaponsBox.anchors.margins)))
             width:weaponsBox.width - 20
             anchors.horizontalCenter: parent.horizontalCenter
 
@@ -345,16 +346,12 @@ Dialog
 
 Row {
     id: buttonRow
-    x: 338
-    width: 160
+
     anchors.bottom: parent.bottom
-    anchors.bottomMargin: 9
-    anchors.top: weaponsBox.bottom
-    anchors.topMargin: 11
-    anchors.rightMargin: 5
+    anchors.bottomMargin: 10
+    anchors.rightMargin: 10
     spacing: 10
     anchors.right: parent.right
-
     Button {
         id: okButton
         text: qsTr("OK")

@@ -4,6 +4,7 @@ import QtQuick.Controls 1.3
 Item {
     width: 100
     height: 30
+    property alias traitLabel: traitLabel
     property alias traitRatingBox: traitRatingBox
     Row {
         id: row1
@@ -19,7 +20,7 @@ Item {
 
         ComboBox {
             id: traitRatingBox
-            width: 30
+            width: 40
             height: 20
             onActivated:
             {

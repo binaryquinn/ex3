@@ -4,6 +4,7 @@
 CombatTracker::CombatTracker(QObject *parent) : QObject(parent)
 {
     battleStarted = false;
+    myCurrentTick = 0;
 }
 
 CombatTracker::~CombatTracker()
@@ -15,39 +16,35 @@ void CombatTracker::addCombatant(Combatant *add)
 {
     add->joinBattle();
 
-    QList<Combatant *> *host;
-    QMap<int, Combatant * > *hostMap;
+    QMultiMap<int, Combatant * > *hostMap;
     if(!battleStarted)
     {
-        host = &myCurrentRound;
         hostMap = &currentRoundMap;
     }
     else
     {
-        host = &myNextRound;
         hostMap = &nextRoundMap;
     }
 
 
-    if(host->count() == 0)
-        host->append(add);
-    else
-        binaryInsertion(host,add,0,host->count());
-
     hostMap->insertMulti(add->initiative(),add);
 
-    if(!battleStarted) emit currentRoundChanged();
-    else emit nextRoundChanged();
+    myTargets.append(add);
+    emit targetsChanged();
+    add->setList(&myTargets);
+    connect(this, SIGNAL(targetsChanged()),add,SIGNAL(targetsChanged()));
 
-    myTargets.clear();
-    myTargets.append(myCurrentRound);
-    myTargets.append(myNextRound);
-    if(myTargets.count() > 0)
-    {
-        myTargets.removeFirst();
-        emit targetsChanged();
+    if(!battleStarted){
+        if(myCurrentTick < add->initiative())
+            myCurrentTick = add->initiative();
+        emit currentTicksChanged();
+        emit currentRoundChanged();
     }
-
+    else
+    {
+        emit  nextTicksChanged();
+        emit nextRoundChanged();
+    }
 }
 void CombatTracker::attack(int attackerIndex, int attackingWeapon, int defenderIndex, int defendingWeapon, int attackType, int defenseType)
 {
@@ -106,24 +103,12 @@ void CombatTracker::attack(int attackerIndex, int attackingWeapon, int defenderI
     myCurrentRound.first()->refreshTurn();
     emit currentRoundChanged();
     emit nextRoundChanged();
-
-    myTargets.clear();
-    myTargets.append(myCurrentRound);
-    myTargets.append(myNextRound);
-    if(myTargets.count() > 0)
-    {
-        myTargets.removeFirst();
-        emit targetsChanged();
-    }
-
-
 }
 
-void CombatTracker::modifyCombatant(int index, bool current, int unit, int amount, bool done)
+void CombatTracker::modifyCombatant(Combatant* subject, int unit, int amount, bool done)
 {
-    Combatant *subject = (current)? myCurrentRound[index] : myTargets[index];
-    QList<Combatant *> *host = myCurrentRound.contains(subject)? &myCurrentRound : &myNextRound;
-
+    QMultiMap<int, Combatant * > *hostMap = currentRoundMap.contains(subject->initiative(),subject)? &currentRoundMap : &nextRoundMap;
+    int tick = subject->initiative();
     if(amount != 0)
     {
 
@@ -132,64 +117,98 @@ void CombatTracker::modifyCombatant(int index, bool current, int unit, int amoun
         else
             subject->suffer(std::abs(amount),(CombatConstants::Wounds)unit);
     }
-    host->removeOne(subject);
+
+    hostMap->remove(tick,subject);
     if(done)
     {
-        host =  &myNextRound;
+        hostMap =  &nextRoundMap;
     }
+
 
     if(!(subject->isDead()||subject->isIncapacitated()))
-        binaryInsertion(host, subject,0, host->count());
-
-
-    if(myCurrentRound.count() < 1)
+        hostMap->insertMulti(subject->initiative(), subject);
+    else
     {
-        myCurrentRound.swap(myNextRound);
+        myTargets.removeOne(subject);
+        targetsChanged();
+
     }
-    myCurrentRound.first()->refreshTurn();
-    emit currentRoundChanged();
-    emit nextRoundChanged();
 
-    myTargets.clear();
-    myTargets.append(myCurrentRound);
-    myTargets.append(myNextRound);
-    if(myTargets.count() > 0)
+    if(currentRoundMap.values(myCurrentTick).count() < 1)
     {
-        myTargets.removeFirst();
-        emit targetsChanged();
+        myCurrentRound.clear();
+        if(currentRoundMap.count() < 1)
+        {
+            currentRoundMap.swap(nextRoundMap);
+            myNextRound.clear();
+        }
+        myCurrentTick = currentTicks()[0].toInt();
+        foreach(Combatant* combat,currentRoundMap.values(myCurrentTick))
+        {
+            combat->refreshTurn();
+            emit combat->targetsChanged();
+        }
     }
 
 }
 
+void CombatTracker::modifyCombatants(int attackerIndex, int attackUnit, int attackAmount, bool done, int defenderIndex, int defenderUnit, int defenderAmount)
+{
+    Combatant* attacker = myCurrentRound[attackerIndex];
+    Combatant* defender = myTargets[defenderIndex];
+    modifyCombatant(attacker,attackUnit,attackAmount,done);
+    modifyCombatant(defender, defenderUnit,defenderAmount,false);
+
+    emit currentTicksChanged();
+    emit currentRoundChanged();
+    emit nextTicksChanged();
+   emit nextRoundChanged();
+}
+
 QQmlListProperty<Combatant> CombatTracker::currentRound()
 {
+    if(currentRoundMap.count() > 0  && myCurrentRound != currentRoundMap.values(myCurrentTick))
+    {
+        myCurrentRound = currentRoundMap.values(myCurrentTick);
+    }
     return QQmlListProperty<Combatant>(this,myCurrentRound);
 }
 
 QQmlListProperty<Combatant> CombatTracker::nextRound()
 {
+
+    if(nextRoundMap.count() > 0  && myNextRound != nextRoundMap.values())
+    {
+        myNextRound = nextRoundMap.values();
+    }
     return QQmlListProperty<Combatant>(this,myNextRound);
 }
 
-QQmlListProperty<Combatant> CombatTracker::validTargets()
+
+
+QVariantList CombatTracker::currentTicks()
 {
-    return QQmlListProperty<Combatant>(this,myTargets);
+    QVariantList temp;
+    foreach(int num,currentRoundMap.uniqueKeys())
+    {
+        int index ;
+        for( index = 0; index < temp.size() && num < temp[index].toInt();index++);
+        temp.insert(index, QVariant(num));
+    }
+    return temp;
 }
 
-QList<int> CombatTracker::currentTicks()
-{
-    return currentRoundMap.keys();
-}
 
-QQmlListProperty<Combatant> CombatTracker::combatantsOnTick(int tick, CombatConstants::Rounds which)
+QVariantList CombatTracker::nextTicks()
 {
-    QList<Combatant*> temp = (which == CombatConstants::Current)?currentRoundMap.values(tick):nextRoundMap.values(tick);
-    return QQmlListProperty<Combatant>(this,temp);
-}
-
-QList<int> CombatTracker::nextTicks()
-{
-    return nextRoundMap.keys();
+    QVariantList temp;
+    foreach(int num,nextRoundMap.uniqueKeys())
+    {
+        int index ;
+        for( index = 0; index < temp.size() && num < temp[index].toInt();index++);
+        temp.insert(index, QVariant(num));
+    }
+    return temp;
 }
 
 bool CombatTracker::inBattle()

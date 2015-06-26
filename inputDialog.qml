@@ -69,6 +69,7 @@ Dialog {
                     CheckBox{
                         id:doneCheck
                         text: "done?"
+                        checked: true
                     }
                 }
             }
@@ -97,6 +98,7 @@ Dialog {
                         id: defenderVerbCombo
                         model: Constants.verbs
                         width:75
+                        currentIndex: model.length-1
                     }
 
                     SpinBox {

@@ -42,10 +42,10 @@ public slots:
     static QStringList units();
     static QStringList verbs();
 
-signals:
-    void combatAbilitiesChanged();
-    void allAbilitiesChanged();
-    void rangesChanged();
+//signals:
+//    void combatAbilitiesChanged();
+//    void allAbilitiesChanged();
+//    void rangesChanged();
 
 private:
     static QStringList myAttackAbilities;

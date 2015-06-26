@@ -10,12 +10,14 @@
 #include "combatconstants.h"
 #include "healthtrack.h"
 #include "weapon.h"
+#include <QQmlListProperty>
 
 class D10
 {
 public:
     static int roll(int dieCount, bool dblSuccess = true, int dblThreshold = 10 );
 };
+
 
 class Combatant:public QObject
 {
@@ -28,7 +30,9 @@ class Combatant:public QObject
     Q_PROPERTY(QStringList weaponry READ weaponry  NOTIFY weaponryChanged)
     Q_PROPERTY(QStringList defenseList READ defenseList NOTIFY defensesChanged)
     Q_PROPERTY(int woundPenalty READ woundPenalty NOTIFY penaltyChanged)
+    Q_PROPERTY(int health READ health NOTIFY healthChanged)
     Q_PROPERTY(QStringList actions READ actions NOTIFY actionsChanged)
+    Q_PROPERTY(QQmlListProperty<Combatant> targets READ targets NOTIFY targetsChanged)
 
 public:
     explicit Combatant(QObject *parent = 0);
@@ -36,7 +40,7 @@ public:
 
     void setHealth(QList <int> HLCounts);
     void setArmor(int soak, int hardness, int penalty);
-    int joinBattle();
+    int joinBattle(bool initial = true);
     QList<int> armor();
     int attack(CombatConstants::Attack attackType, Weapon *selectedWeapon);
     int damage(CombatConstants::Attack attackType, Weapon *selectedWeapon);
@@ -52,12 +56,17 @@ public:
     void addWeapon(Weapon *addition);
     QStringList weaponry();
     QString name() const;
+    QQmlListProperty<Combatant> targets();
+    Combatant* targetAtIndex(int index);
+    void setList(QList<Combatant*>*list);
+    int listCount();
 
     int stamina() const;
     QStringList defenseList();
     int woundPenalty();
     bool isIncapacitated();
     bool isDead();
+    int health();
     QStringList actions();
 
 signals:
@@ -68,7 +77,10 @@ signals:
     void weaponryChanged();
     void defensesChanged();
     void penaltyChanged();
+    void healthChanged();
     void actionsChanged();
+    void targetsChanged();
+
 
 private:
     QString myName;
@@ -89,6 +101,8 @@ private:
     void initialize();
     int parryDefense(Weapon *weapon);
     int myCrashGuard;
+    QList<Combatant*> myTargets;
+    QList<Combatant*> *targetList;
 };
 
 #endif // COMBATANT_H

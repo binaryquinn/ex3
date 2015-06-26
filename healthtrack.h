@@ -15,6 +15,7 @@ public:
     bool isDead();
     bool isIncapacitated();
     void setHealthLevel(int level, int number);
+    int healthLeft();
 signals:
     void healthChanged();
     void penaltyChanged();

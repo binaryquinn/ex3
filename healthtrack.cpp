@@ -99,17 +99,22 @@ void HealthTrack::setHealthLevel(int level, int number)
         int difference = myLevels[level].second - number;
         if(difference != 0)
         {
-            if(difference > 0)
+            if(difference < 0)
             {
-                for(; difference > 0; difference--)
+                for(; difference < 0; difference++)
                     myHealth.append(CombatConstants::None);
             }
             else
             {
-                for(; difference < 0; difference++)
+                for(; difference > 0; difference--)
                     myHealth.pop_back();
             }
             emit healthChanged();
         }
     }
+}
+
+int HealthTrack::healthLeft()
+{
+    return myHealth.size() - (aggravatedCount + lethalCount + bashingCount);
 }

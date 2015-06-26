@@ -32,9 +32,10 @@ void Combatant::setArmor(int soak, int hardness, int penalty)
     myMobilityPenalty = penalty;
 }
 
-int Combatant::joinBattle()
+int Combatant::joinBattle(bool initial)
 {
-    myInitiative = 3 + D10::roll(std::max(myWits + myCombatAbilities["Awareness"],0));
+    myInitiative = D10::roll(std::max(myWits + myCombatAbilities["Awareness"],0));
+    myInitiative+= (initial)? 3 : 0;
     return myInitiative;
 }
 
@@ -188,6 +189,22 @@ QString Combatant::name() const
 {
     return myName;
 }
+
+QQmlListProperty<Combatant> Combatant::targets()
+{
+    QList<Combatant*> *temp = new QList<Combatant*>(*targetList);
+
+    temp->removeOne(this);
+    return QQmlListProperty<Combatant>(this, *temp);
+}
+
+void Combatant::setList(QList<Combatant *> *list)
+{
+    targetList = list;
+}
+
+
+
 int Combatant::stamina() const
 {
     return myStamina;
@@ -213,8 +230,9 @@ void Combatant::initialize()
     QStringList abilist = CombatConstants::allAbilities();
     foreach(QString ability , abilist)
         myCombatAbilities.insert(ability,0);
-    myActionList  << "Attack (Withering)" << "Attack (Decisive)" << "Full Defense" << "Delay Action" << "Miscellaeneous Attack";
+    myActionList  << "Attack (Withering)" << "Attack (Decisive)" << "Aim" << "Full Defense" << "Delay Action" << "Miscellaeneous Attack";
     connect(&myHealth,&HealthTrack::penaltyChanged, this, &Combatant::penaltyChanged);
+    connect(&myHealth,&HealthTrack::healthChanged, this, &Combatant::healthChanged);
 }
 
 int Combatant::parryDefense(Weapon *weapon)
@@ -238,6 +256,11 @@ bool Combatant::isDead()
     return myHealth.isDead();
 }
 
+int Combatant::health()
+{
+    return myHealth.healthLeft();
+}
+
 QStringList Combatant::actions()
 {
     if(myHealth.isIncapacitated())
@@ -253,6 +276,7 @@ QStringList Combatant::actions()
 
     return myActionList;
 }
+
 
 int D10::roll(int dieCount, bool dblSuccess, int dblThreshold)
 {

@@ -8,7 +8,7 @@ Window
 {
     id: window1
     title: qsTr("Exalted 3rd Edition Combat Tracker")
-    width: 800
+    width: 850
     height: 480
     visible: true
 
@@ -43,24 +43,26 @@ Window
                 ListView {
                     id: currentRoundView
                     anchors.fill: parent
-                    delegate: Item {
-                        x: 5
+                    model:(!!Tracker)?Tracker.currentTicks:0
+                    delegate: Item{
                         width: 80
-                        height: 40
-                        Row {
-                            id: row1
+                        height: 30
+                        Row{
                             spacing: 10
+                            id: row1
+
                             Text {
-                                text: name + " ("+ initiative + ")"
-                                font.bold: true
-                                anchors.verticalCenter: parent.verticalCenter
+                                width: 80
+                                height: 40
+                                text:modelData
                             }
                         }
                     }
-                    model: (!!Tracker)? Tracker.currentRound : 0
                 }
             }
         }
+
+
         Button {
             id: addCombatantButton
             text: qsTr("Add Combatant")
@@ -73,7 +75,7 @@ Window
             text: Tracker.inBattle?qsTr("Stop Combat") : qsTr("Start Combat");
             anchors.top: parent.verticalCenter
             anchors.topMargin: 5
-            enabled:(!!Tracker)? (Tracker.currentRound.length + Tracker.nextRound.length) > 1 : 0
+            //enabled:
             onClicked: Tracker.inBattle = !Tracker.inBattle
         }
 
@@ -98,6 +100,7 @@ Window
                         x: 5
                         width: 80
                         height: 40
+
                         Row {
                             id: row2
                             spacing: 10
@@ -109,13 +112,12 @@ Window
                         }
                     }
                     model: (!!Tracker)? Tracker.nextRound : 0
+
                 }
             }
         }
     }
-
-    AttackerPanel{
-        id: attackerPanel1
+    ScrollView{
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.top: parent.top
@@ -124,9 +126,21 @@ Window
         anchors.rightMargin: 10
         anchors.left: columnLayout1.right
         anchors.leftMargin: 10
-        enabled:Tracker.inBattle
-    }
 
+        ListView
+        {
+            anchors.fill: parent
+            enabled:Tracker.inBattle
+            model:Tracker.currentRound
+            delegate:
+                AttackerPanel{
+                id: attackerPanel1
+                attacker:model
+                number: index
+
+            }
+        }
+    }
     AddCombatantDialog
     {
         id: messageDialog
