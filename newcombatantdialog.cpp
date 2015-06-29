@@ -5,18 +5,26 @@
 NewCombatantDialog::NewCombatantDialog(QObject *parent) : QObject(parent)
 {
     foreach(QString ability,CombatConstants::allAbilities())
-        myAbilities.append(new TraitRating(ability,0));
+        myAbilities.append(new TraitRating(ability,0,this));
 
     foreach(QString attributes,CombatConstants::attributes())
-        myAttributes.append(new TraitRating(attributes,1));
+        myAttributes.append(new TraitRating(attributes,1,this));
 
-        myHLs.append(new TraitRating("0", 1));
-        myHLs.append(new TraitRating("-1", 2));
-        myHLs.append(new TraitRating("-2", 2));
-        myHLs.append(new TraitRating("-4", 1));
-        myHLs.append(new TraitRating("Incapacitated", 1));
+        myHLs.append(new TraitRating("0", 1, this));
+        myHLs.append(new TraitRating("-1", 2, this));
+        myHLs.append(new TraitRating("-2", 2, this));
+        myHLs.append(new TraitRating("-4", 1, this));
+        myHLs.append(new TraitRating("Incapacitated", 1, this));
 
-    myWeapons.append(new Weapon("Unarmed", Weapon::Mundane, Weapon::Light,"Brawl"));
+        myWeapons.append(new Weapon("Unarmed", Weapon::Mundane, Weapon::Light,"Brawl",CombatConstants::Bashing, CombatConstants::Close,true,false, this));
+}
+
+NewCombatantDialog::~NewCombatantDialog()
+{
+    qDeleteAll(myAbilities);
+    qDeleteAll(myAttributes);
+    qDeleteAll(myHLs);
+    qDeleteAll(myWeapons);
 }
 
 QQmlListProperty<TraitRating> NewCombatantDialog::attributes()
@@ -90,7 +98,7 @@ void NewCombatantDialog::makeCombatant(QString name, int soak, int hardness, int
 
 void NewCombatantDialog::addWeapon(QString name, int qual, int weight, QString ability, int damage, int range)
 {
-    myWeapons.append(new Weapon(name,(Weapon::Quality)qual,(Weapon::WeightClass)weight, ability, (CombatConstants::Wounds)damage, (CombatConstants::Range)range));
+    myWeapons.append(new Weapon(name,(Weapon::Quality)qual,(Weapon::WeightClass)weight, ability, (CombatConstants::Wounds)damage, (CombatConstants::Range)range, this));
     emit weaponsChanged();
 
 }

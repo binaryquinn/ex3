@@ -33,6 +33,7 @@ class NewCombatantDialog : public QObject
     Q_PROPERTY(QQmlListProperty<TraitRating> healthLevels READ healthLevels  NOTIFY healthLevelsChanged)
 public:
     explicit NewCombatantDialog(QObject *parent = 0);
+    ~NewCombatantDialog();
     QQmlListProperty<TraitRating> attributes();
     QQmlListProperty<TraitRating> abilities();
     QQmlListProperty<Weapon> weapons();

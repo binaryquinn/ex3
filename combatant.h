@@ -37,6 +37,7 @@ class Combatant:public QObject
 public:
     explicit Combatant(QObject *parent = 0);
     Combatant(QString name, int dex, int str, int sta, int wit, QObject *parent = 0);
+~Combatant();
 
     void setHealth(QList <int> HLCounts);
     void setArmor(int soak, int hardness, int penalty);
@@ -101,7 +102,6 @@ private:
     void initialize();
     int parryDefense(Weapon *weapon);
     int myCrashGuard;
-    QList<Combatant*> myTargets;
     QList<Combatant*> *targetList;
 };
 

@@ -9,11 +9,12 @@ CombatTracker::CombatTracker(QObject *parent) : QObject(parent)
 
 CombatTracker::~CombatTracker()
 {
-
+    qDeleteAll(myTargets);
 }
 
 void CombatTracker::addCombatant(Combatant *add)
 {
+    add->setParent(this);
     add->joinBattle();
 
     QMultiMap<int, Combatant * > *hostMap;
@@ -94,8 +95,6 @@ void CombatTracker::attack(int attackerIndex, int attackingWeapon, int defenderI
         binaryInsertion(host, defender,0, host->count());
 
 
-
-
     if(myCurrentRound.count() < 1)
     {
         myCurrentRound.swap(myNextRound);
@@ -130,6 +129,7 @@ void CombatTracker::modifyCombatant(Combatant* subject, int unit, int amount, bo
     else
     {
         myTargets.removeOne(subject);
+        delete subject;
         targetsChanged();
 
     }
@@ -162,7 +162,7 @@ void CombatTracker::modifyCombatants(int attackerIndex, int attackUnit, int atta
     emit currentTicksChanged();
     emit currentRoundChanged();
     emit nextTicksChanged();
-   emit nextRoundChanged();
+    emit nextRoundChanged();
 }
 
 QQmlListProperty<Combatant> CombatTracker::currentRound()

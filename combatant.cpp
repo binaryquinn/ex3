@@ -14,6 +14,11 @@ Combatant::Combatant(QString name, int str, int dex, int sta, int wit, QObject *
     initialize();
 }
 
+Combatant::~Combatant()
+{
+    qDeleteAll(myPanoply);
+}
+
 
 
 void Combatant::setHealth(QList<int> HLCounts)
@@ -172,6 +177,7 @@ Weapon *Combatant::weapon(int selected)
 
 void Combatant::addWeapon(Weapon *addition)
 {
+    addition->setParent(this);
     myPanoply.append(addition);
 }
 

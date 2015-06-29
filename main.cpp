@@ -4,6 +4,7 @@
 #include <QtQml>
 #include "combattracker.h"
 #include "newcombatantdialog.h"
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -12,17 +13,21 @@ int main(int argc, char *argv[])
     qmlRegisterType<Combatant>("Model", 1, 0, "Combatant");
     qmlRegisterType<TraitRating>("Model", 1, 0, "TraitRating");
     qmlRegisterType<Weapon>("Model", 1, 0, "Weapon");
-    CombatTracker *myTracker = new CombatTracker(&app);
-    NewCombatantDialog *myDialog = new NewCombatantDialog(&app);
-
-    QObject::connect(myDialog, &NewCombatantDialog::combatantMade, myTracker, &CombatTracker::addCombatant);
+    CombatTracker myTracker(&app);
+    NewCombatantDialog myDialog(&app);
+    CombatConstants* constants= new CombatConstants();
+     Weapon *weapons = new Weapon(&app);
+    QObject::connect(&myDialog, &NewCombatantDialog::combatantMade, &myTracker, &CombatTracker::addCombatant);
     std::srand(QTime::currentTime().msec());
 
-    engine.rootContext()->setContextProperty("Tracker", myTracker);
-    engine.rootContext()->setContextProperty("newCombatant", myDialog);
-    engine.rootContext()->setContextProperty("Constants", new CombatConstants());
-    engine.rootContext()->setContextProperty("Weapons", new Weapon(&app));
+    engine.rootContext()->setContextProperty("Tracker", &myTracker);
+    engine.rootContext()->setContextProperty("newCombatant", &myDialog);
+    engine.rootContext()->setContextProperty("Constants", constants);
+    engine.rootContext()->setContextProperty("Weapons",weapons);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
-    return app.exec();
+    app.exec();
+    delete constants;
+    delete weapons;
+    return 0;
 }
