@@ -198,10 +198,16 @@ QString Combatant::name() const
 
 QQmlListProperty<Combatant> Combatant::targets()
 {
-    QList<Combatant*> *temp = new QList<Combatant*>(*targetList);
+    temp.clear();
+    temp.append(*targetList);
 
-    temp->removeOne(this);
-    return QQmlListProperty<Combatant>(this, *temp);
+    temp.removeOne(this);
+    return QQmlListProperty<Combatant>(this, temp);
+}
+
+Combatant *Combatant::targetAtIndex(int index)
+{
+    return targetList->at(index);
 }
 
 void Combatant::setList(QList<Combatant *> *list)

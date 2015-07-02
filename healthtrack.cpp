@@ -1,4 +1,5 @@
 #include "healthtrack.h"
+#include <QPair>
 
 HealthTrack::HealthTrack(QObject *parent):QObject(parent)
 {

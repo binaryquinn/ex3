@@ -129,9 +129,7 @@ void CombatTracker::modifyCombatant(Combatant* subject, int unit, int amount, bo
     else
     {
         myTargets.removeOne(subject);
-        delete subject;
-        targetsChanged();
-
+//        delete subject;
     }
 
     if(currentRoundMap.values(myCurrentTick).count() < 1)
@@ -155,10 +153,13 @@ void CombatTracker::modifyCombatant(Combatant* subject, int unit, int amount, bo
 void CombatTracker::modifyCombatants(int attackerIndex, int attackUnit, int attackAmount, bool done, int defenderIndex, int defenderUnit, int defenderAmount)
 {
     Combatant* attacker = myCurrentRound[attackerIndex];
-    Combatant* defender = myTargets[defenderIndex];
+    Combatant* defender = (defenderIndex < myTargets.indexOf(attacker))?myTargets[defenderIndex]:myTargets[defenderIndex+1];
     modifyCombatant(attacker,attackUnit,attackAmount,done);
     modifyCombatant(defender, defenderUnit,defenderAmount,false);
 
+    if(defender->isDead()||defender->isIncapacitated())
+        defender->deleteLater();
+    emit targetsChanged();
     emit currentTicksChanged();
     emit currentRoundChanged();
     emit nextTicksChanged();

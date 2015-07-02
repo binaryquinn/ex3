@@ -103,6 +103,8 @@ private:
     int parryDefense(Weapon *weapon);
     int myCrashGuard;
     QList<Combatant*> *targetList;
+    QList<Combatant*> temp;
+
 };
 
 #endif // COMBATANT_H
