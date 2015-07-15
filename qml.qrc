@@ -20,5 +20,6 @@
     <qresource prefix="/defaults">
         <file>ranges.xml</file>
         <file>weapons.xml</file>
+        <file>actions.xml</file>
     </qresource>
 </RCC>

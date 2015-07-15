@@ -1,4 +1,6 @@
 #include "combatconstants.h"
+#include <QFile>
+#include <QXmlStreamReader>
 
 QStringList CombatConstants::myAttackAbilities;
 QStringList CombatConstants::myOtherAbilities;
@@ -7,6 +9,7 @@ QStringList CombatConstants::myDamageTypes;
 QStringList CombatConstants::myAttributes;
 QStringList CombatConstants::myUnits;
 QStringList CombatConstants::myVerbs;
+QStringList CombatConstants::myActions;
 
 QStringList CombatConstants::combatAbilities()
 {
@@ -72,4 +75,31 @@ QStringList CombatConstants::verbs()
         myVerbs << "Gains" << "Loses";
     }
     return myVerbs;
+}
+
+QStringList CombatConstants::actions()
+{
+    if(myActions.empty())
+    {
+        QFile loadFile(QStringLiteral(":/defaults/actions.xml"));
+
+        if (!loadFile.open(QIODevice::ReadOnly))
+        {
+            qWarning("Couldn't open actions file.");
+        }
+
+        QByteArray loadData = loadFile.readAll();
+        QXmlStreamReader actionReader(loadData);
+
+        while(!actionReader.atEnd())
+        {
+            actionReader.readNext();
+            if(actionReader.isStartElement() && actionReader.name() == "Action")
+            {
+                myActions << actionReader.attributes().value("name").toString();
+            }
+        }
+        loadFile.close();
+    }
+    return myActions;
 }

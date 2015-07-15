@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Actions>
+    <Action name = "Aims at" target = "other" flurry = "0" crashed = "1">
+        <Bonus value="3"/>
+    </Action>
+    <Action name = "Attack (Decisive)" target = "other" flurry = "1" crashed = "0">
+        <Cost type = "complex"/>
+    </Action>
+    <Action name = "Attack (Withering)"  target = "other" flurry = "1" crashed = "1">
+        <Cost type = "complex"/>
+    </Action>
+    <Action name = "Defend Other" target = "self" flurry = "0" crashed = "1">
+        <Cost type = "initiative" value = "2"/>
+    </Action>
+    <Action name = "Delay Action" target = "self" flurry = "0" crashed = "1">
+        <Cost type = "initiative" value = "2"/>
+    </Action>
+    <Action name = "Disengage" target = "other" flurry = "1" crashed = "1">
+        <Cost type = "initiative" value = "2"/>
+    </Action>
+    <Action name = "Flurry"  target = "any" flurry = "0" penalty = "-3" crashed = "1">
+        <Cost type = "defense" value = "1"/>
+    </Action>
+    <Action name = "Full Defense" target = "self" flurry = "0" crashed = "0">
+        <Cost type = "initiative" value = "1"/>
+    </Action>
+    <Action name = "Miscellaeneous" target = "any" flurry = "1" crashed = "1">
+        <Cost type = "defense" value = "1"/>
+    </Action>
+    <Action name = "Move" target = "self" flurry = "1" crashed = "1">
+        <Cost type = "" value = ""/>
+    </Action>
+    <Action name = "Rise From Prone" target = "self" flurry = "1" crashed = "1">
+        <Cost type = "" value = ""/>
+    </Action>
+    <Action name = "Rush" target = "Other" flurry = "1" crashed = "1">
+        <Cost type = "" value = ""/>
+    </Action>
+    <Action name = "Take Cover" target = "self" flurry = "1" crashed = "1">
+        <Cost type = "" value = ""/>
+    </Action>
+    <Action name = "Withdraw" target = "self" flurry = "1" crashed = "1">
+        <Cost type = "" value = ""/>
+    </Action>
+</Actions>

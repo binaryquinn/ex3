@@ -25,3 +25,5 @@ HEADERS += \
     combatconstants.h \
     weapon.h \
     newcombatantdialog.h
+
+DISTFILES +=
