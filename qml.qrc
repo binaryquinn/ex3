@@ -8,6 +8,7 @@
         <file>TraitViewDelegate.qml</file>
         <file>DefenderChoiceDialog.qml</file>
         <file>InputDialog.qml</file>
+        <file>RollMethodPanel.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>square-empty.png</file>
