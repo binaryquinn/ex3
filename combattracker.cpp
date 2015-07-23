@@ -56,7 +56,7 @@ void CombatTracker::attack(int attackerIndex, int attackingWeapon, int defenderI
 
     Weapon *aWeapon = attacker->weapon(attackingWeapon);
     Weapon *dWeapon = defender->weapon(defendingWeapon);
-    int attackResult = attacker->attack((CombatConstants::Attack)attackType, aWeapon) - defender->defense((CombatConstants::Defense)defenseType, dWeapon);
+    int attackResult = D10::roll(std::max(attacker->attack((CombatConstants::Attack)attackType, aWeapon),0)) - defender->defense((CombatConstants::Defense)defenseType, dWeapon);
     if(attackResult > 0)
     {
         int damagePool = attacker->damage((CombatConstants::Attack)attackType, aWeapon) + ((CombatConstants::Attack)attackType == CombatConstants::Withering)? attackResult : 0;
@@ -127,10 +127,7 @@ void CombatTracker::modifyCombatant(Combatant* subject, int unit, int amount, bo
     if(!(subject->isDead()||subject->isIncapacitated()))
         hostMap->insertMulti(subject->initiative(), subject);
     else
-    {
         myTargets.removeOne(subject);
-//        delete subject;
-    }
 
     if(currentRoundMap.values(myCurrentTick).count() < 1)
     {

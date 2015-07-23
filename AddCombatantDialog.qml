@@ -36,18 +36,26 @@ Dialog
 
         TextField {
             id: nameField
-            anchors.right: armorBox.left
-            anchors.rightMargin: 5
             anchors.top: parent.top
             anchors.topMargin: 15
             anchors.left: parent.left
             anchors.leftMargin: 10
+            anchors.right: iniField.left
+            anchors.rightMargin: 5
             placeholderText: qsTr("Name")
             validator: RegExpValidator
             {
-            regExp:/\S+.*/
-        }
-        width:25
+                regExp:/\S+.*/
+            }
+    }
+    TextField{
+        id:iniField
+        anchors.right: armorBox.left
+        anchors.rightMargin: 5
+        anchors.top: nameField.top
+        width:50
+        placeholderText: qsTr("Initiative")
+        validator: IntValidator{}
     }
 
     GroupBox {
@@ -87,10 +95,11 @@ Dialog
         anchors{
             left:nameField.left
             bottom: armorBox.bottom
-            top: nameField.bottom
+            top: iniField.bottom
             topMargin: 5
+            right:iniField.right
         }
-        width:nameField.width
+
         title: qsTr("Attributes")
         RowLayout{
             Repeater {

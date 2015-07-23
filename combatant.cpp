@@ -55,8 +55,8 @@ int Combatant::attack(CombatConstants::Attack attackType, Weapon * selectedWeapo
 {
     int attackBase = myDexterity + myCombatAbilities[selectedWeapon->ability()] + myHealth.currentPenalty();
     if(attackType == CombatConstants::Withering)
-        return D10::roll(std::max(attackBase+ selectedWeapon->accuracy(), 0));
-    return D10::roll(std::max(attackBase,0));
+        attackBase += selectedWeapon->accuracy();
+    return attackBase;
 }
 
 

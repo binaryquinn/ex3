@@ -155,6 +155,7 @@ Item{
                 anchors.left: parent.left
                 penalty: attacker.woundPenalty
                 base: withWhatCombo.currentIndex
+                text:"Base Pool ( Dexterity): " + base
             }
 
         }

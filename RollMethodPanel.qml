@@ -9,7 +9,7 @@ Item {
     width: 250
     height: 115
 
-    property string text:""
+    property alias text:basePoolLabel.text
     property int base: 0
     property int penalty: 0
     QtObject{
@@ -37,7 +37,7 @@ Item {
             anchors.rightMargin: 0
             anchors.left: parent.left
             anchors.leftMargin: 0
-            text: "Base Pool (" + text + "): " + base
+
 
         }
         Label{
