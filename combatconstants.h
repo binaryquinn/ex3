@@ -4,17 +4,12 @@
 #include <QObject>
 #include <QStringList>
 
+
 Q_DECLARE_METATYPE(QStringList)
 class CombatConstants: public QObject
 {
 
     Q_OBJECT
-    Q_ENUMS(Wounds)
-    Q_ENUMS(Attack)
-    Q_ENUMS(Defense)
-    Q_ENUMS(Range)
-    Q_ENUMS(Actions)
-    Q_ENUMS(Rounds)
     Q_PROPERTY(QStringList combatAbilities READ combatAbilities CONSTANT)
     Q_PROPERTY(QStringList allAbilities READ allAbilities CONSTANT)
     Q_PROPERTY(QStringList ranges READ ranges CONSTANT)
@@ -27,11 +22,19 @@ class CombatConstants: public QObject
 public:
 
     enum Wounds{None, Bashing, Lethal, Aggravated};
+    Q_ENUMS(Wounds)
     enum Attack{Withering, Decisive};
+    Q_ENUMS(Attack)
     enum Defense{Overall, Evasion, Parry};
+    Q_ENUMS(Defense)
     enum Range{Close, Short, Medium, Long, Extreme};
+    Q_ENUMS(Range)
     enum Actions{Aim, AttackDecisive, AttackWithering, Delay, DefendOther, Disengage, Flurry, FullDefense, Miscellaneous, Move, RiseFromProne, Rush, TakeCover, Withdraw};
+    Q_ENUMS(Actions)
     enum Rounds{Current, Next};
+    Q_ENUMS(Rounds)
+    enum Targetting{Self, Other, Any};
+    Q_ENUMS(Targetting)
 
 
 public slots:
@@ -44,10 +47,6 @@ public slots:
     static QStringList verbs();
     static  QStringList actions();
 
-//signals:
-//    void combatAbilitiesChanged();
-//    void allAbilitiesChanged();
-//    void rangesChanged();
 
 private:
     static QStringList myAttackAbilities;

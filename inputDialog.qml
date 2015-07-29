@@ -49,7 +49,7 @@ Dialog {
 
                     ComboBox {
                         id: attackerVerbCombo
-                        model: Constants.verbs
+                        model: CombatConstants.verbs
                         width:75
                     }
 
@@ -62,7 +62,7 @@ Dialog {
 
                     ComboBox {
                         id: attackerUnitCombo
-                        model: Constants.units
+                        model: CombatConstants.units
                         width:100
                     }
 
@@ -96,7 +96,7 @@ Dialog {
 
                     ComboBox {
                         id: defenderVerbCombo
-                        model: Constants.verbs
+                        model: CombatConstants.verbs
                         width:75
                         currentIndex: model.length-1
                     }
@@ -110,7 +110,7 @@ Dialog {
 
                     ComboBox {
                         id: defenderUnitCombo
-                        model: Constants.units
+                        model: CombatConstants.units
                         width:100
                     }
                 }

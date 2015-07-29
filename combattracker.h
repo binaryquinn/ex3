@@ -58,6 +58,7 @@ private:
     QMultiMap<int, Combatant *> currentRoundMap;
     QMultiMap<int, Combatant *> nextRoundMap;
     void modifyCombatant(Combatant* subject , int unit, int amount, bool done);
+
 };
 
 #endif // COMBATTRACKER_H

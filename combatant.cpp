@@ -1,8 +1,12 @@
 #include "combatant.h"
+#include "combataction.h"
 #include <math.h>
 #include <QDebug>
+#include <QFile>
+#include <QXmlStreamReader>
 
-
+QList<CombatAction *> Combatant::masterActionList;
+QList<CombatAction *> Combatant::crashedActionList;
 Combatant::Combatant(QObject *parent):QObject(parent), myName(""), myStrength(0), myDexterity(0), myStamina(0), myWits(0), myArmorSoak(0),myHardness(0)
 {
     initialize();
@@ -242,7 +246,43 @@ void Combatant::initialize()
     QStringList abilist = CombatConstants::allAbilities();
     foreach(QString ability , abilist)
         myCombatAbilities.insert(ability,0);
-    myActionList  << "Attack (Withering)" << "Attack (Decisive)" << "Aim" << "Full Defense" << "Delay Action" << "Miscellaeneous Attack";
+
+    if(masterActionList.empty())
+    {
+        QFile loadFile(QStringLiteral(":/defaults/actions.xml"));
+
+        if (!loadFile.open(QIODevice::ReadOnly))
+        {
+            qWarning("Couldn't open actions file.");
+        }
+
+        QByteArray loadData = loadFile.readAll();
+        QXmlStreamReader actionReader(loadData);
+
+        QString name;
+        bool flurry;
+        bool rolled;
+        bool crash;
+
+        CombatConstants::Targetting target;
+        while(!actionReader.atEnd())
+        {
+            actionReader.readNext();
+            if(actionReader.isStartElement() && actionReader.name() == "Action")
+            {
+                name = actionReader.attributes().value("name").toString();
+                flurry = actionReader.attributes().value("flurry").toInt();
+                rolled = actionReader.attributes().value("rolled").toInt();
+                crash = actionReader.attributes().value("crashed").toInt();
+                target = (CombatConstants::Targetting)actionReader.attributes().value("target").toInt();
+
+                masterActionList.append( new CombatAction(name,flurry, rolled, crash, target, this)) ;
+                if(crash)
+                    crashedActionList.append(new CombatAction(name,flurry, rolled, crash, target, this));
+            }
+        }
+        loadFile.close();
+    }
     connect(&myHealth,&HealthTrack::penaltyChanged, this, &Combatant::penaltyChanged);
     connect(&myHealth,&HealthTrack::healthChanged, this, &Combatant::healthChanged);
 }
@@ -273,20 +313,14 @@ int Combatant::health()
     return myHealth.healthLeft();
 }
 
-QStringList Combatant::actions()
+QQmlListProperty<CombatAction> Combatant::actions()
 {
-    if(myHealth.isIncapacitated())
-        return QStringList();
-    if(initiative() > 0 && myActionList.count() == 4)
-    {
-        myActionList.insert(1,"Attack (Decisive)");
-    }
-    else if(initiative() < 1 && myActionList.count() == 5)
-    {
-        myActionList.removeAt(1);
-    }
 
-    return myActionList;
+    if(myInitiative > 0 )
+        return QQmlListProperty<CombatAction>(this, masterActionList);
+    else
+        return QQmlListProperty<CombatAction>(this, crashedActionList);
+
 }
 
 

@@ -3,6 +3,7 @@ import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.1
 import Model 1.0
 import QtQuick.Extras 1.4
+import QtQuick.Controls.Styles 1.2
 
 Item{
 
@@ -90,7 +91,17 @@ Item{
             id:doWhatCombo
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top : nameLabel.top
-            model: (attacker !== undefined)?Constants.actions:0
+            model: (attacker !== undefined)?attacker.actions:0
+            width:150
+            textRole:"name"
+            style:ComboBoxStyle
+            {
+                label:Label
+                {
+                    text:(doWhatCombo.currentIndex == -1)? "do What?":doWhatCombo.currentText
+                }
+            }
+            Component.onCompleted: currentIndex = -1
         }
 
 
@@ -109,13 +120,24 @@ Item{
 
         ComboBox {
             id: toWhomCombo
-            visible: false
+            visible:doWhatCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].getTargetting !== CombatConstants.Self
             anchors.left: doWhatCombo.right
             anchors.leftMargin: 10
             anchors.top: doWhatCombo.top
             anchors.topMargin: 0
             anchors.right: parent.right
             anchors.rightMargin: 10
+            model:attacker.targets
+            textRole: "name"
+            style:ComboBoxStyle
+            {
+                label:Label
+                {
+                    text:(toWhomCombo.currentIndex == -1)? "To Whom?":toWhomCombo.currentText
+                }
+            }
+            Component.onCompleted: currentIndex = -1
+            onVisibleChanged: currentIndex = -1
         }
 
         Item {
@@ -124,7 +146,7 @@ Item{
             y: 34
             width: 300
             height: 149
-
+            visible: doWhatCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].rolledAction
             Item {
                 id: withBox
                 width: 200
@@ -160,6 +182,7 @@ Item{
 
         }
     }
+
 
 
 }

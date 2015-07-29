@@ -11,6 +11,7 @@
 #include "healthtrack.h"
 #include "weapon.h"
 #include <QQmlListProperty>
+#include "combataction.h"
 
 class D10
 {
@@ -18,7 +19,7 @@ public:
     static int roll(int dieCount, bool dblSuccess = true, int dblThreshold = 10 );
 };
 
-
+Q_DECLARE_METATYPE(QList<CombatAction*>)
 class Combatant:public QObject
 {
 
@@ -31,7 +32,7 @@ class Combatant:public QObject
     Q_PROPERTY(QStringList defenseList READ defenseList NOTIFY defensesChanged)
     Q_PROPERTY(int woundPenalty READ woundPenalty NOTIFY penaltyChanged)
     Q_PROPERTY(int health READ health NOTIFY healthChanged)
-    Q_PROPERTY(QStringList actions READ actions NOTIFY actionsChanged)
+    Q_PROPERTY(QQmlListProperty<CombatAction> actions READ actions NOTIFY actionsChanged)
     Q_PROPERTY(QQmlListProperty<Combatant> targets READ targets NOTIFY targetsChanged)
 
 public:
@@ -68,7 +69,7 @@ public:
     bool isIncapacitated();
     bool isDead();
     int health();
-    QStringList actions();
+    QQmlListProperty<CombatAction> actions();
 
 signals:
     void nameChanged();
@@ -98,12 +99,13 @@ private:
     int myMobilityPenalty;
     int myOnslaught;
     int myCrashCounter;
-    QStringList myActionList;
     void initialize();
     int parryDefense(Weapon *weapon);
     int myCrashGuard;
     QList<Combatant*> *targetList;
     QList<Combatant*> temp;
+    static QList<CombatAction *> masterActionList;
+    static QList<CombatAction *> crashedActionList;
 
 };
 

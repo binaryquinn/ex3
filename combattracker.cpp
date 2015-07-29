@@ -1,10 +1,12 @@
 #include "combattracker.h"
 #include <QDebug>
 
+
 CombatTracker::CombatTracker(QObject *parent) : QObject(parent)
 {
     battleStarted = false;
     myCurrentTick = 0;
+
 }
 
 CombatTracker::~CombatTracker()
