@@ -13,11 +13,7 @@
 #include <QQmlListProperty>
 #include "combataction.h"
 
-class D10
-{
-public:
-    static int roll(int dieCount, bool dblSuccess = true, int dblThreshold = 10 );
-};
+
 
 Q_DECLARE_METATYPE(QList<CombatAction*>)
 class Combatant:public QObject
@@ -70,6 +66,9 @@ public:
     bool isDead();
     int health();
     QQmlListProperty<CombatAction> actions();
+    int dicePool(int actionIndex, CombatAction::Pool poolType, int weaponIndex = -1);
+    QString dicePoolString(int actionIndex, CombatAction::Pool poolType, int weaponIndex);
+
 
 signals:
     void nameChanged();

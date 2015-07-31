@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QFile>
 #include <QXmlStreamReader>
+#include "d10.h"
+
 
 QList<CombatAction *> Combatant::masterActionList;
 QList<CombatAction *> Combatant::crashedActionList;
@@ -263,25 +265,35 @@ void Combatant::initialize()
         bool flurry;
         bool rolled;
         bool crash;
-
+        bool weapon;
+        bool decisive;
         CombatConstants::Targetting target;
+
         while(!actionReader.atEnd())
         {
             actionReader.readNext();
-            if(actionReader.isStartElement() && actionReader.name() == "Action")
+            if(actionReader.isStartElement())
             {
-                name = actionReader.attributes().value("name").toString();
-                flurry = actionReader.attributes().value("flurry").toInt();
-                rolled = actionReader.attributes().value("rolled").toInt();
-                crash = actionReader.attributes().value("crashed").toInt();
-                target = (CombatConstants::Targetting)actionReader.attributes().value("target").toInt();
-
-                masterActionList.append( new CombatAction(name,flurry, rolled, crash, target, this)) ;
-                if(crash)
-                    crashedActionList.append(new CombatAction(name,flurry, rolled, crash, target, this));
+                if(actionReader.name() == "Action")
+                {
+                    name = actionReader.attributes().value("name").toString();
+                    flurry = actionReader.attributes().value("flurry").toInt();
+                    rolled = actionReader.attributes().value("rolled").toInt();
+                    crash = actionReader.attributes().value("crashed").toInt();
+                    weapon = actionReader.attributes().value("weapon").toInt();
+                    target = (CombatConstants::Targetting)actionReader.attributes().value("target").toInt();
+                    decisive = actionReader.attributes().hasAttribute("decisive")? actionReader.attributes().value("decisive").toInt(): false;
+                    masterActionList.append( new CombatAction(name,flurry, rolled, crash, weapon, decisive, target, this)) ;
+                    if(crash)
+                        crashedActionList.append(masterActionList.last());
+                }
+                if(actionReader.name() == "Pool")
+                {
+                    masterActionList.last()->addPool(actionReader.attributes().value("attribute").toString(), actionReader.attributes().value("ability").toString());
+                }
             }
+            loadFile.close();
         }
-        loadFile.close();
     }
     connect(&myHealth,&HealthTrack::penaltyChanged, this, &Combatant::penaltyChanged);
     connect(&myHealth,&HealthTrack::healthChanged, this, &Combatant::healthChanged);
@@ -318,31 +330,46 @@ QQmlListProperty<CombatAction> Combatant::actions()
 
     if(myInitiative > 0 )
         return QQmlListProperty<CombatAction>(this, masterActionList);
+
     else
         return QQmlListProperty<CombatAction>(this, crashedActionList);
 
 }
 
-
-int D10::roll(int dieCount, bool dblSuccess, int dblThreshold)
+int Combatant::dicePool(int actionIndex, CombatAction::Pool poolType, int weaponIndex)
 {
+    CombatAction * myAction = (myInitiative > 0 )? masterActionList.at(actionIndex) : crashedActionList.at(actionIndex);
+    QPair<QString,QString> actionPool = myAction->getPool(poolType);
+    int pool = (actionPool.first == "dexterity")?
+                myDexterity : (actionPool.first == "strength")?
+                    myStrength : (actionPool.first == "stamina")? myStamina: myWits;
 
-    int successes = 0;
-    int dieValue = 0;
-    for (int die = 0; die < dieCount; die++)
+    if(actionPool.second != "weapon")
+        pool += myCombatAbilities[actionPool.second];
+
+    else if(weaponIndex >= 0)
     {
-
-        dieValue = (std::rand()%10)+1;
-        if(dieValue > 6 )
-        {
-            successes++;
-            if(dblSuccess)
-            {
-                if(dieValue >= dblThreshold)
-                    successes++;
-            }
-        }
+        pool += myCombatAbilities[myPanoply[weaponIndex]->ability()];
+        if(myAction->isWeaponUsed())
+            pool += myPanoply[weaponIndex]->accuracy();
     }
-    return successes;
+    return pool;
+}
+
+QString Combatant::dicePoolString(int actionIndex, CombatAction::Pool poolType, int weaponIndex)
+{
+    CombatAction * myAction = (myInitiative > 0 )? masterActionList.at(actionIndex) : crashedActionList.at(actionIndex);
+    QPair<QString,QString> actionPool = myAction->getPool(poolType);
+
+    QString poolString = QString("%1 + %2").arg(actionPool.first);
+    if(actionPool.second != "weapon")
+        poolString = poolString.arg(actionPool.second);
+    else if(weaponIndex > -1)
+    {        poolString = poolString.arg(myPanoply[weaponIndex]->ability());
+        if(myAction->decisiveAction())
+            poolString.append(" + weapon accuracy");
+    }
+    return poolString;
+
 }
 

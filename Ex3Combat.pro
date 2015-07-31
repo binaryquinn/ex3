@@ -9,7 +9,8 @@ SOURCES += main.cpp \
     combatconstants.cpp \
     weapon.cpp \
     newcombatantdialog.cpp \
-    combataction.cpp
+    combataction.cpp \
+    d10.cpp
 
 RESOURCES += qml.qrc
 
@@ -26,6 +27,7 @@ HEADERS += \
     combatconstants.h \
     weapon.h \
     newcombatantdialog.h \
-    combataction.h
+    combataction.h \
+    d10.h
 
 DISTFILES +=

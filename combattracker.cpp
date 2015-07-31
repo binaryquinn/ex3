@@ -1,4 +1,5 @@
 #include "combattracker.h"
+#include "d10.h"
 #include <QDebug>
 
 
@@ -165,6 +166,22 @@ void CombatTracker::modifyCombatants(int attackerIndex, int attackUnit, int atta
     emit nextRoundChanged();
 }
 
+int CombatTracker::dicePool(int attackerIndex, int actionIndex, int poolType, int weaponIndex)
+{
+    if(attackerIndex < 0 || actionIndex < 0)
+        return 0;
+    Combatant* attacker = myCurrentRound[attackerIndex];
+    return attacker->dicePool(actionIndex, (CombatAction::Pool)poolType, weaponIndex);
+}
+
+QString CombatTracker::dicePoolString(int attackerIndex, int actionIndex, int poolType, int weaponIndex)
+{
+    if(attackerIndex < 0 || actionIndex < 0)
+        return "";
+    Combatant* attacker = myCurrentRound[attackerIndex];
+    return attacker->dicePoolString(actionIndex, (CombatAction::Pool)poolType, weaponIndex);
+}
+
 QQmlListProperty<Combatant> CombatTracker::currentRound()
 {
     if(currentRoundMap.count() > 0  && myCurrentRound != currentRoundMap.values(myCurrentTick))
@@ -234,4 +251,3 @@ void CombatTracker::binaryInsertion(QList<Combatant *> *host, Combatant* add, in
             binaryInsertion(host, add, left, --mid);
     }
 }
-

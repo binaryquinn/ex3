@@ -18,7 +18,7 @@ Item {
 
     }
 
-    signal result(var method, var value);
+    signal result( bool method, int value);
     Item {
         id: poolBox
         anchors.right: parent.right

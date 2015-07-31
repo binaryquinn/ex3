@@ -9,7 +9,7 @@ Item{
 
     id: item1
     property var attacker
-    property var number
+    property int number
 
     width: 600
     height: 200
@@ -102,6 +102,7 @@ Item{
                 }
             }
             Component.onCompleted: currentIndex = -1
+            onVisibleChanged: currentIndex = -1
         }
 
 
@@ -120,7 +121,7 @@ Item{
 
         ComboBox {
             id: toWhomCombo
-            visible:doWhatCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].getTargetting !== CombatConstants.Self
+            visible:doWhatCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].targetting !== CombatConstants.Self
             anchors.left: doWhatCombo.right
             anchors.leftMargin: 10
             anchors.top: doWhatCombo.top
@@ -138,46 +139,62 @@ Item{
             }
             Component.onCompleted: currentIndex = -1
             onVisibleChanged: currentIndex = -1
+            onCurrentIndexChanged: withWhatCombo.currentIndex = -1
         }
 
         Item {
             id: item2
-            x: 10
-            y: 34
-            width: 300
-            height: 149
-            visible: doWhatCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].rolledAction
-            Item {
-                id: withBox
-                width: 200
-                height: 25
 
-
-                Label{
-                    id: withWhatlabel
-                    text: qsTr("With ")
-                    anchors.verticalCenter: withWhatCombo.verticalCenter
-                    anchors.left: parent.left
-                }
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+            anchors.right: parent.horizontalCenter
+            anchors.rightMargin: 5
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+            anchors.top: nameLabel.bottom
+            anchors.topMargin: 5
+            visible: doWhatCombo.currentIndex > -1
 
                 ComboBox {
-                    id: withWhatCombo
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: withWhatlabel.right
-                    anchors.leftMargin: 5
+                id: withWhatCombo
+                anchors.topMargin: 0
+                anchors.right: parent.right
+                anchors.rightMargin: 0
+                anchors.left: parent.left
+                anchors.leftMargin: 0
+                    anchors.top: parent.top
+
+                    anchors.margins: 5
                     model:attacker.weaponry
-
+                    visible: doWhatCombo.currentIndex > -1 && toWhomCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].usesWeapon
+                    style:ComboBoxStyle
+                    {
+                        label:Label
+                        {
+                            text:(withWhatCombo.currentIndex == -1)? "With What?":withWhatCombo.currentText
+                        }
+                    }
+                    Component.onCompleted: currentIndex = -1
+                    onVisibleChanged: currentIndex = -1
                 }
-            }
-
 
             RollMethodPanel {
                 id: rollMethodPanel1
+                visible: doWhatCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].rolledAction && (!attacker.actions[doWhatCombo.currentIndex].usesWeapon || withWhatCombo.currentIndex > -1)
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 penalty: attacker.woundPenalty
-                base: withWhatCombo.currentIndex
-                text:"Base Pool ( Dexterity): " + base
+                base: visible? Tracker.dicePool(number, doWhatCombo.currentIndex, 0, withWhatCombo.currentIndex) : 0
+                text:visible? (" Base Pool ( " + Tracker.dicePoolString(number, doWhatCombo.currentIndex, 0, withWhatCombo.currentIndex) + "): " + base ) : ""
+                anchors.right: parent.right
+                anchors.rightMargin: 0
+                anchors.top: withWhatCombo.bottom
+                anchors.topMargin: 5
+                onResult:{
+//                    if(!method)
+//                    Tracker.attack(number);
+
+                }
             }
 
         }
