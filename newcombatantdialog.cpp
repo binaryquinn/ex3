@@ -73,7 +73,7 @@ void NewCombatantDialog::cleanDialog()
     emit weaponsChanged();
 }
 
-void NewCombatantDialog::makeCombatant(QString name, int soak, int hardness, int penalty)
+void NewCombatantDialog::makeCombatant(QString name, QVariant ini, int soak, int hardness, int penalty)
 {
     int str = myAttributes[0]->property("stat").toInt();
     int dex = myAttributes[1]->property("stat").toInt();
@@ -93,7 +93,9 @@ void NewCombatantDialog::makeCombatant(QString name, int soak, int hardness, int
     foreach (Weapon * wep, myWeapons)
         newbie->addWeapon(wep);
 
-    emit combatantMade(newbie);
+    if(!ini.isNull())
+        newbie->changeInitiative(ini.toInt());
+    emit combatantMade(newbie,!ini.isNull());
 }
 
 void NewCombatantDialog::addWeapon(QString name, int qual, int weight, QString ability, int damage, int range)

@@ -371,8 +371,8 @@ Row {
             var soak = (soakField.text !== "")? Number(soakField.text) : 0;
             var hardness = (hardnessField.text !== "")? Number(hardnessField.text) : 0;
             var penalty = (mpField.text !== "")? Number(mpField.text) : 0;
-            newCombatant.makeCombatant(nameField.text, soak, hardness, penalty);
-
+            var ini = (iniField.text !=="")? Number(iniField.text): undefined;
+            newCombatant.makeCombatant(nameField.text, ini, soak, hardness, penalty);
             accept();
         }
 

@@ -47,7 +47,7 @@ signals:
 
 
 public slots:
-    void addCombatant(Combatant *add);
+    void addCombatant(Combatant *add, bool iniGiven);
 
 private:
     QList<Combatant *> myCurrentRound;

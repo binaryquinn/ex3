@@ -244,7 +244,7 @@ QStringList Combatant::defenseList()
 void Combatant::initialize()
 {
 
-    myOnslaught = myCrashCounter = myCrashGuard = 0;
+    myInitiative = myOnslaught = myCrashCounter = myCrashGuard = 0;
     QStringList abilist = CombatConstants::allAbilities();
     foreach(QString ability , abilist)
         myCombatAbilities.insert(ability,0);
@@ -267,6 +267,7 @@ void Combatant::initialize()
         bool crash;
         bool weapon;
         bool decisive;
+        QVariant difficulty;
         CombatConstants::Targetting target;
 
         while(!actionReader.atEnd())
@@ -283,7 +284,8 @@ void Combatant::initialize()
                     weapon = actionReader.attributes().value("weapon").toInt();
                     target = (CombatConstants::Targetting)actionReader.attributes().value("target").toInt();
                     decisive = actionReader.attributes().hasAttribute("decisive")? actionReader.attributes().value("decisive").toInt(): false;
-                    masterActionList.append( new CombatAction(name,flurry, rolled, crash, weapon, decisive, target, this)) ;
+                    difficulty = actionReader.attributes().hasAttribute("decisive")? actionReader.attributes().value("difficulty").toString():QVariant();
+                    masterActionList.append( new CombatAction(name,flurry, rolled, crash, weapon, decisive, target, difficulty, this)) ;
                     if(crash)
                         crashedActionList.append(masterActionList.last());
                 }
@@ -340,6 +342,8 @@ int Combatant::dicePool(int actionIndex, CombatAction::Pool poolType, int weapon
 {
     CombatAction * myAction = (myInitiative > 0 )? masterActionList.at(actionIndex) : crashedActionList.at(actionIndex);
     QPair<QString,QString> actionPool = myAction->getPool(poolType);
+    if(actionPool == QPair<QString,QString>())
+        return 0;
     int pool = (actionPool.first == "dexterity")?
                 myDexterity : (actionPool.first == "strength")?
                     myStrength : (actionPool.first == "stamina")? myStamina: myWits;
@@ -347,10 +351,10 @@ int Combatant::dicePool(int actionIndex, CombatAction::Pool poolType, int weapon
     if(actionPool.second != "weapon")
         pool += myCombatAbilities[actionPool.second];
 
-    else if(weaponIndex >= 0)
+    else if(myAction->isWeaponUsed() && weaponIndex > -1)
     {
         pool += myCombatAbilities[myPanoply[weaponIndex]->ability()];
-        if(myAction->isWeaponUsed())
+        if(!myAction->decisiveAction())
             pool += myPanoply[weaponIndex]->accuracy();
     }
     return pool;
@@ -360,13 +364,14 @@ QString Combatant::dicePoolString(int actionIndex, CombatAction::Pool poolType, 
 {
     CombatAction * myAction = (myInitiative > 0 )? masterActionList.at(actionIndex) : crashedActionList.at(actionIndex);
     QPair<QString,QString> actionPool = myAction->getPool(poolType);
-
+    if(actionPool == QPair<QString,QString>())
+        return "";
     QString poolString = QString("%1 + %2").arg(actionPool.first);
     if(actionPool.second != "weapon")
         poolString = poolString.arg(actionPool.second);
-    else if(weaponIndex > -1)
+    else if(myAction->isWeaponUsed() && weaponIndex > -1)
     {        poolString = poolString.arg(myPanoply[weaponIndex]->ability());
-        if(myAction->decisiveAction())
+        if(!myAction->decisiveAction())
             poolString.append(" + weapon accuracy");
     }
     return poolString;

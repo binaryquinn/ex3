@@ -15,10 +15,11 @@ CombatTracker::~CombatTracker()
     qDeleteAll(myTargets);
 }
 
-void CombatTracker::addCombatant(Combatant *add)
+void CombatTracker::addCombatant(Combatant *add, bool iniGiven)
 {
     add->setParent(this);
-    add->joinBattle();
+    if(!iniGiven)
+        add->joinBattle();
 
     QMultiMap<int, Combatant * > *hostMap;
     if(!battleStarted)

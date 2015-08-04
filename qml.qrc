@@ -6,7 +6,7 @@
         <file>UpDownColumn.qml</file>
         <file>HealthLevelDelegate.qml</file>
         <file>TraitViewDelegate.qml</file>
-        <file>DefenderChoiceDialog.qml</file>
+        <file>DefenderChoicePanel.qml</file>
         <file>InputDialog.qml</file>
         <file>RollMethodPanel.qml</file>
     </qresource>

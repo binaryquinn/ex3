@@ -44,11 +44,11 @@ signals:
     void attributesChanged();
     void weaponsChanged();
     void healthLevelsChanged();
-    void combatantMade(Combatant *newbie);
+    void combatantMade(Combatant *newbie, bool iniGiven);
 
 public slots:
     void cleanDialog();
-    void makeCombatant(QString name, int soak, int hardness, int penalty);
+    void makeCombatant(QString name, QVariant ini, int soak, int hardness, int penalty);
     void addWeapon(QString name, int qual, int weight, QString ability, int damage, int range);
 
 private:

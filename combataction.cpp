@@ -1,12 +1,12 @@
 #include "combataction.h"
 
-CombatAction::CombatAction(QObject *parent) : QObject(parent), myName(""),canFlurry(false), isRolled(false), whenCrashed(false), weaponUsed(false), isDecisive(false), myTarget(CombatConstants::Self)
+CombatAction::CombatAction(QObject *parent) : QObject(parent), myName(""),canFlurry(false), isRolled(false), whenCrashed(false), weaponUsed(false), isDecisive(false), myTarget(CombatConstants::Self), myDifficulty(QVariant())
 {
 
 }
 
-CombatAction::CombatAction(QString name, bool flurry, bool rolled, bool crashed, bool weapon, bool decisive, CombatConstants::Targetting target, QObject *parent)
-    : QObject(parent), myName(name),canFlurry(flurry), isRolled(rolled), whenCrashed(crashed), weaponUsed(weapon), isDecisive(decisive), myTarget(target)
+CombatAction::CombatAction(QString name, bool flurry, bool rolled, bool crashed, bool weapon, bool decisive, CombatConstants::Targetting target, QVariant difficulty, QObject *parent)
+    : QObject(parent), myName(name),canFlurry(flurry), isRolled(rolled), whenCrashed(crashed), weaponUsed(weapon), isDecisive(decisive), myTarget(target), myDifficulty(difficulty)
 {
 
 }

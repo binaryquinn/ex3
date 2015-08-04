@@ -4,13 +4,13 @@ import QtQuick.Layouts 1.0
 import QtQuick.Dialogs 1.2
 import Model 1.0
 
-Dialog
-{
+
+Item{
 
     property alias model: defensesView.model
     property alias choice: defensesView.currentIndex
-contentItem:Item{
-    id:defDialog
+
+    id:defPanel
     width: 300
     height: 300
 
@@ -30,7 +30,7 @@ contentItem:Item{
             anchors.rightMargin: 20
             anchors.left: parent.left
             anchors.leftMargin: 20
-            anchors.bottom:buttonRow.top
+           // anchors.bottom:buttonRow.top
             title: qsTr("Defenses")
             ScrollView
             {
@@ -60,45 +60,10 @@ contentItem:Item{
                     }
                     model: 0;
                     onModelChanged: currentIndex = -1;
-                    highlight: highlightBar
+                    //highlight: highlightBar
                     Component.onCompleted: currentIndex = -1
                 }
             }
         }
-        Row {
-            id: buttonRow
-            x: 338
-            width: 160
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 9
-
-            height:40
-            anchors.rightMargin: 5
-            spacing: 10
-            anchors.right: parent.right
-
-            Button {
-                id: okButton
-                text: qsTr("OK")
-                enabled: defensesView.currentIndex > -1
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked:
-                {
-                    accept();
-                }
-
-            }
-            Button {
-                id: cancelButton
-                text: qsTr("Cancel")
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked:
-                {
-                    reject();
-                }
-            }
-        }
     }
-}
-    onVisibleChanged: if(visible)choice = -1;
 }
