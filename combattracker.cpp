@@ -1,6 +1,7 @@
 #include "combattracker.h"
 #include "d10.h"
 #include <QDebug>
+#include "combatant.h"
 
 
 CombatTracker::CombatTracker(QObject *parent) : QObject(parent)
@@ -108,6 +109,11 @@ void CombatTracker::attack(int attackerIndex, int attackingWeapon, int defenderI
     emit nextRoundChanged();
 }
 
+int CombatTracker::roll(int dice)
+{
+    return D10::roll(dice);
+}
+
 void CombatTracker::modifyCombatant(Combatant* subject, int unit, int amount, bool done)
 {
     QMultiMap<int, Combatant * > *hostMap = currentRoundMap.contains(subject->initiative(),subject)? &currentRoundMap : &nextRoundMap;
@@ -167,20 +173,21 @@ void CombatTracker::modifyCombatants(int attackerIndex, int attackUnit, int atta
     emit nextRoundChanged();
 }
 
-int CombatTracker::dicePool(int attackerIndex, int actionIndex, int poolType, int weaponIndex)
+int CombatTracker::dicePool(int actorIndex, int actionIndex, int actionList, int poolType, int weaponIndex)
 {
-    if(attackerIndex < 0 || actionIndex < 0)
+    if(actorIndex < 0 || actionIndex < 0)
         return 0;
-    Combatant* attacker = myCurrentRound[attackerIndex];
-    return attacker->dicePool(actionIndex, (CombatAction::Pool)poolType, weaponIndex);
+    Combatant* actor =  myCurrentRound[actorIndex];
+
+    return actor->dicePool(actionIndex, actionList, (CombatAction::Pool)poolType, weaponIndex);
 }
 
-QString CombatTracker::dicePoolString(int attackerIndex, int actionIndex, int poolType, int weaponIndex)
+QString CombatTracker::dicePoolString(int attackerIndex, int actionIndex, int actionList, int poolType, int weaponIndex)
 {
     if(attackerIndex < 0 || actionIndex < 0)
         return "";
     Combatant* attacker = myCurrentRound[attackerIndex];
-    return attacker->dicePoolString(actionIndex, (CombatAction::Pool)poolType, weaponIndex);
+    return attacker->dicePoolString(actionIndex, actionList, (CombatAction::Pool)poolType, weaponIndex);
 }
 
 QQmlListProperty<Combatant> CombatTracker::currentRound()

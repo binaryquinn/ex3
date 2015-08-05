@@ -25,8 +25,6 @@ Combatant::~Combatant()
     qDeleteAll(myPanoply);
 }
 
-
-
 void Combatant::setHealth(QList<int> HLCounts)
 {
     if(HLCounts.size() != 5)
@@ -45,7 +43,7 @@ void Combatant::setArmor(int soak, int hardness, int penalty)
 
 int Combatant::joinBattle(bool initial)
 {
-    myInitiative = D10::roll(std::max(myWits + myCombatAbilities["Awareness"],0));
+    myInitiative = D10::roll(std::max(myWits + myAbilities["Awareness"],0));
     myInitiative+= (initial)? 3 : 0;
     return myInitiative;
 }
@@ -59,7 +57,7 @@ QList<int> Combatant::armor()
 
 int Combatant::attack(CombatConstants::Attack attackType, Weapon * selectedWeapon)
 {
-    int attackBase = myDexterity + myCombatAbilities[selectedWeapon->ability()] + myHealth.currentPenalty();
+    int attackBase = myDexterity + myAbilities[selectedWeapon->ability()] + myHealth.currentPenalty();
     if(attackType == CombatConstants::Withering)
         attackBase += selectedWeapon->accuracy();
     return attackBase;
@@ -77,7 +75,7 @@ int Combatant::defense(CombatConstants::Defense defenseType, Weapon *weapon, boo
 {
     int value;
     int parryDef =  parryDefense(weapon);
-    int evasion = ceil((double)(myDexterity+myCombatAbilities["Dodge"])/2) - myMobilityPenalty;;
+    int evasion = ceil((double)(myDexterity+myAbilities["Dodge"])/2) - myMobilityPenalty;;
     switch(defenseType)
     {
         case CombatConstants::Overall: value = (evasion > parryDef) ? evasion : parryDef; break;
@@ -169,8 +167,8 @@ int Combatant::takeDamage(CombatConstants::Attack attackType, int damage, int ov
 
 void Combatant::setAbility(QString name, int value)
 {
-    if(myCombatAbilities.contains(name))
-        myCombatAbilities[name] = value;
+    if(myAbilities.contains(name))
+        myAbilities[name] = value;
 }
 
 
@@ -187,14 +185,9 @@ void Combatant::addWeapon(Weapon *addition)
     myPanoply.append(addition);
 }
 
-QStringList Combatant::weaponry()
+QQmlListProperty<Weapon> Combatant::weaponry()
 {
-    QStringList weaponNames;
-    foreach(Weapon * weapon, myPanoply)
-    {
-        weaponNames.append(weapon->name());
-    }
-    return weaponNames;
+    return QQmlListProperty<Weapon>(this, myPanoply);
 }
 
 QString Combatant::name() const
@@ -247,7 +240,7 @@ void Combatant::initialize()
     myInitiative = myOnslaught = myCrashCounter = myCrashGuard = 0;
     QStringList abilist = CombatConstants::allAbilities();
     foreach(QString ability , abilist)
-        myCombatAbilities.insert(ability,0);
+        myAbilities.insert(ability,0);
 
     if(masterActionList.empty())
     {
@@ -284,7 +277,7 @@ void Combatant::initialize()
                     weapon = actionReader.attributes().value("weapon").toInt();
                     target = (CombatConstants::Targetting)actionReader.attributes().value("target").toInt();
                     decisive = actionReader.attributes().hasAttribute("decisive")? actionReader.attributes().value("decisive").toInt(): false;
-                    difficulty = actionReader.attributes().hasAttribute("decisive")? actionReader.attributes().value("difficulty").toString():QVariant();
+                    difficulty = actionReader.attributes().hasAttribute("difficulty")? actionReader.attributes().value("difficulty").toString():QVariant();
                     masterActionList.append( new CombatAction(name,flurry, rolled, crash, weapon, decisive, target, difficulty, this)) ;
                     if(crash)
                         crashedActionList.append(masterActionList.last());
@@ -303,7 +296,7 @@ void Combatant::initialize()
 
 int Combatant::parryDefense(Weapon *weapon)
 {
-    int ability = myCombatAbilities.contains(weapon->ability()) ? myCombatAbilities[weapon->ability()] : 0;
+    int ability = myAbilities.contains(weapon->ability()) ? myAbilities[weapon->ability()] : 0;
     return ceil((double)(myDexterity + ability)/2) + weapon->defense();
 }
 
@@ -338,9 +331,9 @@ QQmlListProperty<CombatAction> Combatant::actions()
 
 }
 
-int Combatant::dicePool(int actionIndex, CombatAction::Pool poolType, int weaponIndex)
+int Combatant::dicePool(int actionIndex, int actionList, CombatAction::Pool poolType, int weaponIndex)
 {
-    CombatAction * myAction = (myInitiative > 0 )? masterActionList.at(actionIndex) : crashedActionList.at(actionIndex);
+    CombatAction * myAction = (actionList )? masterActionList.at(actionIndex) : crashedActionList.at(actionIndex);
     QPair<QString,QString> actionPool = myAction->getPool(poolType);
     if(actionPool == QPair<QString,QString>())
         return 0;
@@ -349,20 +342,20 @@ int Combatant::dicePool(int actionIndex, CombatAction::Pool poolType, int weapon
                     myStrength : (actionPool.first == "stamina")? myStamina: myWits;
 
     if(actionPool.second != "weapon")
-        pool += myCombatAbilities[actionPool.second];
+        pool += myAbilities[actionPool.second];
 
     else if(myAction->isWeaponUsed() && weaponIndex > -1)
     {
-        pool += myCombatAbilities[myPanoply[weaponIndex]->ability()];
+        pool += myAbilities[myPanoply[weaponIndex]->ability()];
         if(!myAction->decisiveAction())
             pool += myPanoply[weaponIndex]->accuracy();
     }
     return pool;
 }
 
-QString Combatant::dicePoolString(int actionIndex, CombatAction::Pool poolType, int weaponIndex)
+QString Combatant::dicePoolString(int actionIndex, int actionList, CombatAction::Pool poolType, int weaponIndex)
 {
-    CombatAction * myAction = (myInitiative > 0 )? masterActionList.at(actionIndex) : crashedActionList.at(actionIndex);
+    CombatAction * myAction = (actionList)? masterActionList.at(actionIndex) : crashedActionList.at(actionIndex);
     QPair<QString,QString> actionPool = myAction->getPool(poolType);
     if(actionPool == QPair<QString,QString>())
         return "";

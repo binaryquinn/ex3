@@ -22,7 +22,6 @@ private:
 };
 
 
-Q_DECLARE_METATYPE(QList<Weapon*>)
 Q_DECLARE_METATYPE(QList<TraitRating*>)
 class NewCombatantDialog : public QObject
 {

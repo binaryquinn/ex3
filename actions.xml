@@ -3,10 +3,10 @@
     <Action name = "Aims at" target = "1" flurry = "0" crashed = "1" rolled = "0" weapon = "0">
         <Bonus value="3"/>
     </Action>
-    <Action name = "Attack (Decisive)" target = "1" flurry = "1" crashed = "0" rolled = "1" weapon = "1" decisive= "1" difficulty="defense">
-        <Pool attribute = "dexterity" ability = "weapon" against = "defense"/>
+    <Action name = "Attack (Decisive)" target = "1" flurry = "1" crashed = "0" rolled = "1" weapon = "1" decisive= "1" difficulty = "defense">
+        <Pool attribute = "dexterity" ability = "weapon" />
     </Action>
-    <Action name = "Attack (Withering)"  target = "1" flurry = "1" crashed = "1" rolled = "1" weapon = "1" difficulty="defense">
+    <Action name = "Attack (Withering)"  target = "1" flurry = "1" crashed = "1" rolled = "1" weapon = "1" difficulty = "defense">
         <Pool attribute = "dexterity" ability = "weapon" />
     </Action>
     <Action name = "Defend Other" target = "1" flurry = "0" crashed = "1" rolled = "0" weapon = "1">
@@ -17,8 +17,8 @@
     </Action>
     <Action name = "Disengage" target = "1" flurry = "1" crashed = "1" rolled = "1" weapon = "0">
         <Cost type = "initiative" value = "2"/>
-        <Pool attribute = "dexterity" ability = "dodge"/>
-        <Pool attribute = "dexterity" ability = "athletics"/>
+        <Pool attribute = "dexterity" ability = "Dodge"/>
+        <Pool attribute = "dexterity" ability = "Athletics"/>
     </Action>
     <Action name = "Flurry"  target = "0" flurry = "0" penalty = "-3" crashed = "1" rolled = "0" weapon = "0">
         <Cost type = "defense" value = "1"/>
@@ -35,8 +35,8 @@
         <Pool attribute = "dexterity" ability = "Dodge" against = "2"/>
     </Action>
     <Action name = "Rush" target = "1" flurry = "1" crashed = "1" rolled = "1" weapon = "0">
-        <Pool attribute = "dexterity" ability = "athletics"/>
-        <Pool attribute = "dexterity" ability = "athletics"/>
+        <Pool attribute = "dexterity" ability = "Athletics"/>
+        <Pool attribute = "dexterity" ability = "Athletics"/>
     </Action>
     <Action name = "Take Cover" target = "0" flurry = "1" crashed = "1" rolled = "0" weapon = "0">
     </Action>

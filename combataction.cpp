@@ -49,6 +49,11 @@ bool CombatAction::decisiveAction() const
     return isDecisive;
 }
 
+bool CombatAction::isContested() const
+{
+    return myPools.count() > 1;
+}
+
 bool CombatAction::isWeaponUsed() const
 {
     return weaponUsed;

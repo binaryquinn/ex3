@@ -15,7 +15,7 @@ Window
 
     ColumnLayout {
         id: columnLayout1
-        width: parent.width/5
+        width: parent.width/7
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.top: parent.top
@@ -44,6 +44,7 @@ Window
                     id: currentRoundView
                     anchors.fill: parent
                     model:(!!Tracker)?Tracker.currentTicks:0
+
                     delegate: Item{
                         width: 80
                         height: 30
@@ -75,7 +76,7 @@ Window
             text: Tracker.inBattle?qsTr("Stop Combat") : qsTr("Start Combat");
             anchors.top: parent.verticalCenter
             anchors.topMargin: 5
-            //enabled:
+            enabled: (Tracker.currentTicks.length > 1 || Tracker.currentRound.length > 1)
             onClicked: Tracker.inBattle = !Tracker.inBattle
         }
 
@@ -137,6 +138,7 @@ Window
                 id: attackerPanel1
                 attacker:model
                 number: index
+                width: parent.width - 10
 
             }
         }

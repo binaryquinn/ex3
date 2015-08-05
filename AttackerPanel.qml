@@ -11,7 +11,7 @@ Item{
     property var attacker
     property int number
 
-    width: 600
+
     height: 200
 
     Rectangle{
@@ -21,10 +21,6 @@ Item{
 
 
         border.width: 1
-
-
-
-
 
         Label{
             id: nameLabel
@@ -38,53 +34,6 @@ Item{
             anchors.top: parent.top
             anchors.topMargin: 10
         }
-
-
-        //    Label{
-        //        id: nSoakLabel
-        //        text: (attacker !== undefined)? qsTr("Natural Soak: ") + attacker.stamina : qsTr("Natural Soak: ")
-        //        anchors.top: initiativeLabel.bottom
-        //        anchors.topMargin: 5
-        //        anchors.left: parent.left
-        //        anchors.leftMargin: 10
-        //    }
-
-        //    Label{
-        //        id: aSoakLabel
-        //        text: (attacker !== undefined)? qsTr("Armor Soak: ") + attacker.armor[0] : qsTr("Armor Soak: ")
-        //        anchors.top: nSoakLabel.top
-        //        anchors.topMargin: 0
-        //        anchors.left:nSoakLabel.right
-        //        anchors.leftMargin: 10
-        //    }
-
-        //    Label{
-        //        id: totalSoakLabel
-        //        text: (attacker !== undefined)? qsTr("Total Soak: ") + (attacker.armor[0] + attacker.stamina) : qsTr("Total Soak: ")
-        //        anchors.top: nSoakLabel.top
-        //        anchors.topMargin: 0
-        //        anchors.left:aSoakLabel.right
-        //        anchors.leftMargin: 10
-
-        //    }
-
-        //    Label {
-        //        id: woundLabel
-        //        text: (attacker !== undefined)? qsTr("Wound Penalty: ") + attacker.woundPenalty : qsTr("Wound Penalty: 0")
-        //        anchors.top: nSoakLabel.bottom
-        //        anchors.topMargin: 5
-        //        anchors.left: parent.left
-        //        anchors.leftMargin: 10
-        //    }
-        //    Label {
-        //        id: healthLabel
-        //        text: (attacker !== undefined)? qsTr("Health: ") + attacker.health : qsTr("Health: ")
-        //        anchors.top: woundLabel.top
-        //        anchors.topMargin: 0
-        //        anchors.left: woundLabel.right
-        //        anchors.leftMargin: 10
-        //    }
-
 
         ComboBox
         {
@@ -105,18 +54,6 @@ Item{
             onVisibleChanged: currentIndex = -1
         }
 
-
-
-        InputDialog
-        {
-            id: actionDialog
-            width: 400
-            height: 200
-            onAccepted:
-            {
-                Tracker.modifyCombatants(number, attackerUnit, attackerAmount*attackerDirection, attackerDone, defenderIndex, defenderUnit, defenderAmount * defenderDirection);
-            }
-        }
 
         ComboBox {
         id: toWhomCombo
@@ -162,9 +99,10 @@ Item{
             anchors.left: parent.left
             anchors.leftMargin: 0
             anchors.top: parent.top
-
             anchors.margins: 5
+
             model:attacker.weaponry
+            textRole: "name"
             visible: doWhatCombo.currentIndex > -1 && toWhomCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].usesWeapon
             style:ComboBoxStyle
             {
@@ -183,15 +121,14 @@ Item{
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             penalty: attacker.woundPenalty
-            base: visible? Tracker.dicePool(number, doWhatCombo.currentIndex, 0, withWhatCombo.currentIndex) : 0
-            text:visible? (" Base Pool ( " + Tracker.dicePoolString(number, doWhatCombo.currentIndex, 0, withWhatCombo.currentIndex) + "): " + base ) : ""
+            base: visible? Tracker.dicePool(attacker, doWhatCombo.currentIndex, attacker.initiative > 0, 0, withWhatCombo.currentIndex) : 0
+            text:visible? (" Base Pool ( " + Tracker.dicePoolString(number, doWhatCombo.currentIndex, attacker.initiative > 0, 0, withWhatCombo.currentIndex) + "): " + base ) : ""
             anchors.right: parent.right
             anchors.rightMargin: 0
             anchors.top: withWhatCombo.bottom
             anchors.topMargin: 5
             onResult:{
-            //                    if(!method)
-            //                    Tracker.attack(number);
+                            var rollResult = (method)? value : Tracker.roll(value)
 
             }
         }
@@ -204,31 +141,45 @@ Item{
         anchors.topMargin: 0
         anchors.right: parent.right
         anchors.rightMargin: 5
-        anchors.left: doWhatCombo.right
+        anchors.left: toWhomCombo.left
+        anchors.leftMargin: 0
+
+        ComboBox {
+            id: defenderCombo
+            anchors.topMargin: 0
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+            anchors.left: parent.left
             anchors.leftMargin: 0
+            anchors.top: parent.top
+            anchors.margins: 5
 
-            ComboBox {
-                id: defenderCombo
-                anchors.topMargin: 0
-                anchors.right: parent.right
-                anchors.rightMargin: 0
-                anchors.left: parent.left
-                anchors.leftMargin: 0
-                anchors.top: parent.top
-                anchors.margins: 5
-
-                visible: doWhatCombo.currentIndex > -1 && toWhomCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].difficulty ==="defense"
-                model: visible? attacker.targets[toWhomCombo.currentIndex].defenseList:0
-                style:ComboBoxStyle
+            visible: doWhatCombo.currentIndex > -1 && toWhomCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].difficulty ==="defense"
+            model: visible? attacker.targets[toWhomCombo.currentIndex].defenseList:0
+            style:ComboBoxStyle
+            {
+                label:Label
                 {
-                    label:Label
-                    {
-                        text:(defenderCombo.currentIndex == -1)? "With What?":defenderCombo.currentText
-                    }
+                    text:(defenderCombo.currentIndex == -1)? "Attempts to...":defenderCombo.currentText
                 }
-                Component.onCompleted: currentIndex = -1
-                onVisibleChanged: currentIndex = -1
             }
+            Component.onCompleted: currentIndex = -1
+            onVisibleChanged: currentIndex = -1
+        }
+
+        RollMethodPanel
+        {
+            id:reactiveRollPanel
+            visible: doWhatCombo.currentIndex > -1 && toWhomCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].contested
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            penalty: visible?attacker.targets[toWhomCombo.currentIndex].woundPenalty:0
+            base: visible? Tracker.dicePool(toWhomCombo.currentIndex, doWhatCombo.currentIndex, attacker.initiative > 0, 1, defenderCombo.currentIndex) : 0
+            text:visible? (" Base Pool ( " + Tracker.dicePoolString(toWhomCombo.currentIndex, doWhatCombo.currentIndex, attacker.initiative > 0, 1, withWhatCombo.currentIndex) + "): " + base ) : ""
+            anchors.right: parent.right
+            anchors.rightMargin: 0
+        }
+
     }
 }
 

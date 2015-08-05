@@ -84,7 +84,8 @@ Item {
             width: 48
             height: 20
             anchors.centerIn: parent
-            rotation: 90
+            rotation: -90
+            checked:true
 
         }
     }
@@ -105,6 +106,7 @@ Item {
         anchors.verticalCenter: enterYourResultsLabel.verticalCenter
         anchors.left: enterYourResultsLabel.right
         anchors.leftMargin: 10
+        enabled: rollSwitch.checked
     }
 
     Label {
@@ -114,7 +116,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: parent.height/4
         anchors.left: switchPanel.right
-        anchors.rightMargin: 5
+        anchors.leftMargin: 5
     }
 
     Button {

@@ -15,8 +15,10 @@ class CombatAction : public QObject
     Q_PROPERTY(bool rolledAction READ isRolledAction CONSTANT)
     Q_PROPERTY(bool duringCrash READ canUseWhenCrashed CONSTANT)
     Q_PROPERTY(bool usesWeapon READ isWeaponUsed CONSTANT)
+    Q_PROPERTY(bool decisive READ decisiveAction CONSTANT)
     Q_PROPERTY(QVariant difficulty MEMBER myDifficulty CONSTANT)
     Q_PROPERTY(CombatConstants::Targetting targetting READ getTargetting CONSTANT)
+    Q_PROPERTY(bool contested READ isContested CONSTANT)
 
 public:
     explicit CombatAction(QObject *parent = 0);
@@ -33,8 +35,8 @@ public:
     CombatConstants::Targetting getTargetting() const;
     void addPool(QString attribute, QString ability);
     QPair<QString,QString> getPool(CombatAction::Pool which);
-
     bool decisiveAction() const;
+    bool isContested() const;
 
 signals:
 

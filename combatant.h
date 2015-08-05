@@ -16,6 +16,7 @@
 
 
 Q_DECLARE_METATYPE(QList<CombatAction*>)
+Q_DECLARE_METATYPE(QList<Weapon*>)
 class Combatant:public QObject
 {
 
@@ -24,7 +25,7 @@ class Combatant:public QObject
     Q_PROPERTY(int initiative READ initiative NOTIFY initiativeChanged)
     Q_PROPERTY(QList<int> armor READ armor NOTIFY armorChanged)
     Q_PROPERTY(int stamina READ stamina NOTIFY staminaChanged)
-    Q_PROPERTY(QStringList weaponry READ weaponry  NOTIFY weaponryChanged)
+    Q_PROPERTY(QQmlListProperty<Weapon> weaponry READ weaponry  NOTIFY weaponryChanged)
     Q_PROPERTY(QStringList defenseList READ defenseList NOTIFY defensesChanged)
     Q_PROPERTY(int woundPenalty READ woundPenalty NOTIFY penaltyChanged)
     Q_PROPERTY(int health READ health NOTIFY healthChanged)
@@ -36,11 +37,13 @@ public:
     Combatant(QString name, int dex, int str, int sta, int wit, QObject *parent = 0);
 ~Combatant();
 
+
+    int attack(CombatConstants::Attack attackType, Weapon *selectedWeapon);
     void setHealth(QList <int> HLCounts);
     void setArmor(int soak, int hardness, int penalty);
     int joinBattle(bool initial = true);
     QList<int> armor();
-    int attack(CombatConstants::Attack attackType, Weapon *selectedWeapon);
+
     int damage(CombatConstants::Attack attackType, Weapon *selectedWeapon);
     int defense(CombatConstants::Defense defenseType, Weapon *weapon, bool onslaught = true);
     void refreshTurn();
@@ -52,7 +55,7 @@ public:
     void setAbility(QString name, int value);
     Weapon *weapon(int selected);
     void addWeapon(Weapon *addition);
-    QStringList weaponry();
+    QQmlListProperty<Weapon> weaponry();
     QString name() const;
     QQmlListProperty<Combatant> targets();
     Combatant* targetAtIndex(int index);
@@ -66,9 +69,8 @@ public:
     bool isDead();
     int health();
     QQmlListProperty<CombatAction> actions();
-    int dicePool(int actionIndex, CombatAction::Pool poolType, int weaponIndex = -1);
-    QString dicePoolString(int actionIndex, CombatAction::Pool poolType, int weaponIndex);
-
+    QString dicePoolString(int actionIndex, int actionList, CombatAction::Pool poolType, int weaponIndex);
+    int dicePool(int actionIndex, int actionList, CombatAction::Pool poolType, int weaponIndex );
 
 signals:
     void nameChanged();
@@ -91,7 +93,7 @@ private:
     int myDexterity;
     int myStamina;
     int myWits;
-    QMap<QString,int> myCombatAbilities;
+    QMap<QString,int> myAbilities;
     QList<Weapon *> myPanoply;
     int myArmorSoak;
     int myHardness;
