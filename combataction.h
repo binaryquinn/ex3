@@ -25,7 +25,7 @@ public:
     CombatAction(QString name, bool flurry, bool rolled, bool crashed, bool weapon, bool decisive, CombatConstants::Targetting target, QVariant difficulty, QObject *parent = 0);
 
     enum Pool{ Proactive, Reactive};
-    Q_ENUM(Pool)
+    Q_ENUMS(Pool)
 
     QString getName() const;
     bool canFlurryThis() const;

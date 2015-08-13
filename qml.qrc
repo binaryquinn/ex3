@@ -7,7 +7,7 @@
         <file>HealthLevelDelegate.qml</file>
         <file>TraitViewDelegate.qml</file>
         <file>DefenderChoicePanel.qml</file>
-        <file>InputDialog.qml</file>
+        <file>InputPanel.qml</file>
         <file>RollMethodPanel.qml</file>
     </qresource>
     <qresource prefix="/images">
