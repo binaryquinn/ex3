@@ -2,7 +2,6 @@ import QtQuick 2.4
 import QtQuick.Controls 1.3
 import QtQuick.Layouts 1.1
 import Model 1.0
-//import QtQuick.Extras 1.4
 import QtQuick.Controls.Styles 1.2
 
 Item{
@@ -12,7 +11,7 @@ Item{
     property int number
 
 
-    height: 200
+    height: 250
 
     Rectangle{
         id:rect1
@@ -106,7 +105,7 @@ Item{
             }
 
             RollMethodPanel {
-                id: rollMethodPanel1
+                id: proactiveRollPanel
                 visible: doWhatCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].rolledAction && (!attacker.actions[doWhatCombo.currentIndex].usesWeapon || withWhatCombo.currentIndex > -1)
                 anchors.left: parent.left
                 penalty: attacker.woundPenalty
@@ -115,21 +114,10 @@ Item{
                 anchors.right: parent.right
                 anchors.top: withWhatCombo.bottom
                 anchors.margins: 5
-                anchors.bottom: proactiveInput.top
+                anchors.bottom: parent.bottom
                 onResult:{
                     var rollResult = (method)? value : Tracker.roll(value)
 
-                }
-            }
-            InputPanel{
-                id:proactiveInput
-                visible: doWhatCombo.currentIndex > -1 && (!attacker.actions[doWhatCombo.currentIndex].usesWeapon || withWhatCombo.currentIndex > -1)
-                anchors
-                {
-                    margins:5
-                    bottom:parent.bottom
-                    left:parent.left
-                    right:parent.right
                 }
             }
         }
@@ -184,8 +172,10 @@ Item{
                 }
             }
         }
+        Switch {
+            id:lockInSwitch
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
     }
-
-
-
+    }
 }

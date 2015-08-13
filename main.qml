@@ -11,8 +11,8 @@ Window
     width: 1000
     height: 480
     visible: true
-    
-    
+
+
     ColumnLayout {
         id: columnLayout1
         width: parent.width/7
@@ -22,9 +22,9 @@ Window
         anchors.topMargin: 10
         anchors.left: parent.left
         anchors.leftMargin: 10
-        
-        
-        
+
+
+
         GroupBox {
             id: currentRoundGroup
             anchors.right: parent.right
@@ -36,22 +36,22 @@ Window
             anchors.bottom: buttonPanel.top
             anchors.bottomMargin: 5
             title: qsTr("Current Round")
-            
+
             ScrollView{
                 anchors.fill: parent
-                
+
                 ListView {
                     id: currentRoundView
                     anchors.fill: parent
                     model:(!!Tracker)?Tracker.currentTicks:0
-                    
+
                     delegate: Item{
                         width: 80
                         height: 30
                         Row{
                             spacing: 10
                             id: row1
-                            
+
                             Text {
                                 width: 80
                                 height: 40
@@ -62,15 +62,18 @@ Window
                 }
             }
         }
-        
+
    Item{
         id:buttonPanel
         anchors.centerIn: parent
+        width:currentRoundGroup.width
+        Component.onCompleted: height =childrenRect.height
         Button {
             id: addCombatantButton
             text: qsTr("Add Combatant")
+
             anchors.bottom: parent.verticalCenter
-            anchors.bottomMargin: 5
+            anchors.margins: 5
             anchors.left: parent.left
             onClicked: messageDialog.open()
         }
@@ -81,13 +84,14 @@ Window
             anchors.bottom: combatControlButton.bottom
             anchors.left: addCombatantButton.right
             anchors.leftMargin: 10
-//            anchors.right: parent.right
+            anchors.right: parent.right
         }
         Button {
             id: combatControlButton
             text: Tracker.inBattle?qsTr("Stop Combat") : qsTr("Start Combat");
             anchors.top: parent.verticalCenter
-            anchors.topMargin: 5
+            anchors.margins: 5
+            anchors.left: parent.left
             anchors.right: commitButton.left
             enabled: (Tracker.currentTicks.length > 1 || Tracker.currentRound.length > 1)
             onClicked: Tracker.inBattle = !Tracker.inBattle
@@ -114,7 +118,7 @@ Window
                         x: 5
                         width: 80
                         height: 40
-                        
+
                         Row {
                             id: row2
                             spacing: 10
@@ -126,7 +130,7 @@ Window
                         }
                     }
                     model: (!!Tracker)? Tracker.nextRound : 0
-                    
+
                 }
             }
         }
@@ -140,7 +144,7 @@ Window
         anchors.rightMargin: 10
         anchors.left: columnLayout1.right
         anchors.leftMargin: 10
-        
+
         ListView
         {
             anchors.fill: parent
@@ -152,7 +156,7 @@ Window
                 attacker:model
                 number: index
                 width: parent.width - 10
-                
+
             }
         }
     }
@@ -163,5 +167,5 @@ Window
         width:600
         onVisibleChanged:if(!visible) messageDialog.clearFields();
     }
-    
+
 }
