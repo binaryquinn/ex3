@@ -81,12 +81,14 @@ border.width: 1
 
         Switch {
             id: rollSwitch
+            width: 70
+            height:30
             style: SwitchStyle {
                     groove: Rectangle {
-                            implicitWidth: 75
-                            implicitHeight: 40
+                            implicitWidth: control.width
+                            implicitHeight: control.height
                             radius: 9
-                            border.color: control.activeFocus ? "darkblue" : "gray"
+                            color: control.activeFocus ? "darkblue" : "gray"
                             border.width: 1
                     }
                 }
