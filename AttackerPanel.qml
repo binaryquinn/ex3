@@ -9,7 +9,7 @@ Item{
     id: item1
     property var attacker
     property int number
-
+    readonly property var defender: (toWhomCombo.currentIndex > -1)? attacker.targets[toWhomCombo.currentIndex]:0
 
     height: 250
 
@@ -68,15 +68,13 @@ Item{
                 }
             }
             Component.onCompleted: currentIndex = -1
-            onVisibleChanged: currentIndex = -1
             onCurrentIndexChanged: withWhatCombo.currentIndex = -1
+            onVisibleChanged: currentIndex = -1
+
         }
 
         Item{
             id: item2
-
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 5
             anchors.right: doWhatCombo.left
             anchors.rightMargin: 0
             anchors.left: parent.left
@@ -104,8 +102,9 @@ Item{
                 onVisibleChanged: currentIndex = -1
             }
 
-            RollMethodPanel {
-                id: proactiveRollPanel
+
+            PoolCalcPanel {
+                id: proactivePoolPanel
                 visible: doWhatCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].rolledAction && (!attacker.actions[doWhatCombo.currentIndex].usesWeapon || withWhatCombo.currentIndex > -1)
                 anchors.left: parent.left
                 penalty: attacker.woundPenalty
@@ -115,16 +114,10 @@ Item{
                 anchors.top: withWhatCombo.bottom
                 anchors.margins: 5
                 anchors.bottom: parent.bottom
-                onResult:{
-                    var rollResult = (method)? value : Tracker.roll(value)
-
-                }
             }
         }
         Item {
             id: item3
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 0
             anchors.top: item2.top
             anchors.topMargin: 0
             anchors.right: parent.right
@@ -134,48 +127,78 @@ Item{
             visible: toWhomCombo.currentIndex > -1
             ComboBox {
                 id: defenderCombo
-
                 anchors.right: parent.right
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.margins: 5
-
                 visible: doWhatCombo.currentIndex > -1 && toWhomCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].difficulty ==="defense"
-                model: visible? attacker.targets[toWhomCombo.currentIndex].defenseList:0
+                model: (!!defender)? defender.defenseList:0
                 style:ComboBoxStyle {
                     label:Label {
                         text:(defenderCombo.currentIndex == -1)? "Attempts to...":defenderCombo.currentText
-                        }
+                    }
                 }
                 Component.onCompleted: currentIndex = -1
                 onVisibleChanged: currentIndex = -1
             }
 
-            RollMethodPanel {
-                id:reactiveRollPanel
+            PoolCalcPanel{
+                id:reactivePoolPanel
                 visible: doWhatCombo.currentIndex > -1 && toWhomCombo.currentIndex > -1 && attacker.actions[doWhatCombo.currentIndex].contested
-                anchors.bottom: reactiveInput.top
+                anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
-                penalty: visible?attacker.targets[toWhomCombo.currentIndex].woundPenalty:0
+                penalty: visible? defender.woundPenalty:0
                 base: visible? Tracker.dicePool(toWhomCombo.currentIndex, doWhatCombo.currentIndex, attacker.initiative > 0, 1, defenderCombo.currentIndex) : 0
                 text:visible? (" Base Pool ( " + Tracker.dicePoolString(toWhomCombo.currentIndex, doWhatCombo.currentIndex, attacker.initiative > 0, 1, withWhatCombo.currentIndex) + "): " + base ) : ""
             }
+        }
 
-            InputPanel {
-                id: reactiveInput
-                anchors{
-                    bottom:parent.bottom
-                    margins:5
-                    left:parent.left
-                    right:parent.right
-                }
-            }
+        InputPanel{
+            anchors.bottom: lockInSwitch.top
+            anchors.left:parent.left
+            visible:rollChoice.checked && proactivePoolPanel.visible
+        }
+        RollMethodPanel{
+         id:rollChoice
+         anchors.top:item2.Bottom
+         anchors.horizontalCenter: parent.horizontalCenter
+         anchors.bottom: lockInSwitch.top
+         visible: proactivePoolPanel.visible || reactivePoolPanel.visible
+        }
+
+        InputPanel{
+            anchors.bottom: lockInSwitch.top
+            anchors.right:parent.right
+            visible:rollChoice.checked && reactivePoolPanel.visible
         }
         Switch {
+            visible: parent.enabled
             id:lockInSwitch
+            style: SwitchStyle {
+                groove: Rectangle {
+                        implicitWidth: control.width
+                        implicitHeight: control.height
+                        gradient: Gradient{
+                            GradientStop { position: 0.0; color: control.checked?"darkgoldenrod" : "dimgrey"}
+                            GradientStop { position: 0.1; color: control.checked?"goldenrod" : "darkgrey"}
+                            GradientStop { position: 0.4; color: control.checked?"gold" : "lightgrey" }
+                            GradientStop { position: 0.6; color: control.checked?"gold" : "lightgrey" }
+                            GradientStop { position: 0.9; color: control.checked?"goldenrod" : "darkgrey"}
+                            GradientStop { position: 1.0; color: control.checked?"darkgoldenrod" : "dimgrey"}
+                            }
+                        border{
+                            width: 1
+                            color: "grey"
+                        }
+                        }
+               }
+
+            width:parent.width - 10
+            height:20
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
     }
     }
 }

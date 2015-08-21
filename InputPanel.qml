@@ -4,69 +4,68 @@ import QtQuick.Layouts 1.0
 import QtQuick.Dialogs 1.2
 import Model 1.0
 
-
 Item{
-
-    height: 50
-
+    height: woundTypeCombo.height*3
+    width:300
     readonly property int initiativeDamage: initiativeAmountSpinner.value*((initiativeVerbCombo.currentIndex < 1)?1:-1)
     readonly property int healthDamage: healthAmountSpinner.value*((healthVerbCombo.currentIndex < 1)?1:-1)
     property alias woundUnit: woundTypeCombo.currentIndex
 
-    Column {
-        id: columnLayout1
+
+    ColumnLayout{
         anchors.fill: parent
-
-        Row{
-            id: rowLayout1
+        anchors.margins: 5
+        spacing: 5
+        RowLayout{
+            height:(parent.height-parent.spacing-parent.anchors.margins)/2
             spacing: 5
-
             ComboBox {
                 id: initiativeVerbCombo
                 model: Constants.verbs
-                width:75
+                Layout.preferredWidth: 65
+                Layout.fillWidth:false
             }
 
             SpinBox {
                 id: initiativeAmountSpinner
-                width: 50
                 minimumValue: 0
                 value: 0
+                Layout.fillWidth:false
             }
-             Label{
-              text:"Initiative"
-             }
+            Label{
+                text:"Initiative"
+
             }
-
-        Row {
-            id: rowLayout2
-            spacing: 5
-
+        }
+        RowLayout{
+            height:(parent.height-parent.spacing-parent.anchors.margins)/2
             ComboBox {
                 id: healthVerbCombo
                 model: Constants.verbs
-                width:75
-                currentIndex: model.length-1
+                Layout.preferredWidth:65
+                Layout.fillWidth:false
             }
 
             SpinBox {
                 id: healthAmountSpinner
-                width: 50
                 minimumValue: 0
                 value: 0
+                Layout.fillWidth:false
+
+
             }
 
             ComboBox {
                 id: woundTypeCombo
                 model: Constants.damageTypes
-                width:90
+                Layout.preferredWidth: 100
+                Layout.fillWidth:false
             }
 
             Label{
-             text:"Health Levels"
+                text:"Health Levels"
             }
         }
     }
-
 }
 

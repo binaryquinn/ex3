@@ -8,6 +8,7 @@
         <file>TraitViewDelegate.qml</file>
         <file>DefenderChoicePanel.qml</file>
         <file>InputPanel.qml</file>
+        <file>PoolCalcPanel.qml</file>
         <file>RollMethodPanel.qml</file>
     </qresource>
     <qresource prefix="/images">
