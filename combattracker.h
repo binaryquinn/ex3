@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QList>
 #include <QMap>
-
+#include <QJsonObject>
 
 Q_DECLARE_METATYPE(QList<Combatant*>)
 Q_DECLARE_METATYPE(QList<int>)
@@ -25,6 +25,7 @@ public:
     Q_INVOKABLE void attack(int attackerIndex, int aWeapon, int defenderIndex, int dWeapon, int attackType, int defenseType = CombatConstants::Overall);
 
     Q_INVOKABLE void modifyCombatants(int attacker, int attackUnit, int attackAmount, bool done, int defender, int defenderUnit, int defenderAmount);
+    Q_INVOKABLE void modifyCombatants(QJsonObject tickActionsList);
     Q_INVOKABLE int dicePool(int actorIndex, int actionIndex, int actionList, int poolType, int weaponIndex);
     Q_INVOKABLE QString dicePoolString(int attackerIndex, int actionIndex, int actionList, int poolType, int weaponIndex);
     QQmlListProperty<Combatant> currentRound();

@@ -161,8 +161,8 @@ void CombatTracker::modifyCombatants(int attackerIndex, int attackUnit, int atta
 {
     Combatant* attacker = myCurrentRound[attackerIndex];
     Combatant* defender = (defenderIndex < myTargets.indexOf(attacker))?myTargets[defenderIndex]:myTargets[defenderIndex+1];
-    modifyCombatant(attacker,attackUnit,attackAmount,done);
-    modifyCombatant(defender, defenderUnit,defenderAmount,false);
+    modifyCombatant(attacker, attackUnit, attackAmount, done);
+    modifyCombatant(defender, defenderUnit, defenderAmount, false);
 
     if(defender->isDead()||defender->isIncapacitated())
         defender->deleteLater();
@@ -171,6 +171,16 @@ void CombatTracker::modifyCombatants(int attackerIndex, int attackUnit, int atta
     emit currentRoundChanged();
     emit nextTicksChanged();
     emit nextRoundChanged();
+}
+
+void CombatTracker::modifyCombatants(QJsonObject tickActionsList)
+{
+   //QMap<int,QVariantMap> actorMap;
+
+
+            foreach (QString indexKey, tickActionsList.keys()) {
+                qDebug() << tickActionsList[indexKey];
+            }
 }
 
 int CombatTracker::dicePool(int actorIndex, int actionIndex, int actionList, int poolType, int weaponIndex)

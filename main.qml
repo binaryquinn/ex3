@@ -6,12 +6,14 @@ import QtQuick.Layouts 1.1
 
 Window
 {
-    id: window1    
+    id: window1
     title: qsTr("Exalted 3rd Edition Combat Tracker")
     width: 1000
     height: 480
     visible: true
 
+    property var roundActionsList
+    property int counter
     ColumnLayout {
         id: columnLayout1
         width: parent.width/6
@@ -84,6 +86,8 @@ Window
             anchors.left: addCombatantButton.right
             anchors.leftMargin: 10
             anchors.right: parent.right
+            enabled: combatControlButton.enabled && Tracker.inBattle && counter === Tracker.currentRound.length
+            onClicked: Tracker.modifyCombatants(roundActionsList)
         }
         Button {
             id: combatControlButton
@@ -156,9 +160,23 @@ Window
                 number: index
                 width: parent.width - 10
                 onActionResults: {
+                    if(values !== -1)
+                    {
 
+                        roundActionsList[index] = values;
+                        counter++;
+                    }
+                    else
+                    {
+                        roundActionsList[index] = undefined
+                        counter--;
+                    }
                 }
             }
+        onModelChanged: {
+            roundActionsList = {};
+            counter = 0;
+        }
         }
     }
     AddCombatantDialog

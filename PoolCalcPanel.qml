@@ -11,11 +11,9 @@ Item {
     property alias text:basePoolLabel.text
     property int base: 0
     property int penalty: 0
-    QtObject{
-        id:finalProp
-        property int finalValue: (base > penalty)?(base - penalty):0;
+    readonly property int finalValue: (base > penalty)?(base - penalty):0;
 
-    }
+
     Item {
         id: poolBox
         anchors.fill: parent
@@ -39,7 +37,7 @@ Item {
             anchors.rightMargin: 0
             anchors.left: parent.left
             anchors.leftMargin: 0
-            text: "penaltys: " + penalty
+            text: "penalties: " + penalty
         }
 
         Label{
@@ -50,7 +48,7 @@ Item {
             anchors.rightMargin: 0
             anchors.left: parent.left
             anchors.leftMargin: 0
-            text: "Final Pool: " + finalProp.finalValue
+            text: "Final Pool: " + finalValue
         }
     }
 }
