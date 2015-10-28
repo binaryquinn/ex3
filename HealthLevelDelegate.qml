@@ -58,6 +58,7 @@ import QtQuick.Controls 1.3
                         width: 18
                         height: 18
                         source: "images/square-empty.png"
+
                     }
                     onModelChanged: if(model < 3) hlDelegate.height = 35
                 }

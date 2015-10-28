@@ -271,10 +271,10 @@ void Combatant::initialize()
                 if(actionReader.name() == "Action")
                 {
                     name = actionReader.attributes().value("name").toString();
-                    flurry = actionReader.attributes().value("flurry").toInt();
-                    rolled = actionReader.attributes().value("rolled").toInt();
-                    crash = actionReader.attributes().value("crashed").toInt();
-                    weapon = actionReader.attributes().value("weapon").toInt();
+                    flurry = actionReader.attributes().hasAttribute("flurry")?true:false;
+                    rolled = actionReader.attributes().hasAttribute("rolled")?true:false;
+                    crash = actionReader.attributes().hasAttribute("crashed")?true:false;
+                    weapon = actionReader.attributes().hasAttribute("weapon")?true:false;
                     target = (CombatConstants::Targetting)actionReader.attributes().value("target").toInt();
                     decisive = actionReader.attributes().hasAttribute("decisive")? actionReader.attributes().value("decisive").toInt(): false;
                     difficulty = actionReader.attributes().hasAttribute("difficulty")? actionReader.attributes().value("difficulty").toString():QVariant();
@@ -282,7 +282,7 @@ void Combatant::initialize()
                     if(crash)
                         crashedActionList.append(masterActionList.last());
                 }
-                if(actionReader.name() == "Pool")
+                else if(actionReader.name() == "Pool")
                 {
                     masterActionList.last()->addPool(actionReader.attributes().value("attribute").toString(), actionReader.attributes().value("ability").toString());
                 }

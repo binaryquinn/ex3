@@ -4,18 +4,22 @@ import QtQuick.Extras 1.4
 import QtQuick.Layouts 1.2
 import QtQuick.Controls.Styles 1.2
 
-Item{
+Item {
+
     id: resultsPanel
     height: 75
-    width: switchPanel.width+forYouLabel.width+15
+    width: (yourResultsLabel.implicitWidth > forYouLabel.implicitWidth?
+            yourResultsLabel.implicitWidth : forYouLabel.implicitWidth)
+           + switchPanel.width + 15
     anchors.bottom: parent.bottom
     anchors.bottomMargin: 0
 
     readonly property alias checked:rollSwitch.checked
+
     Item {
         id: switchPanel
 
-        width: 50
+        width: 30
         height: parent.height
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
@@ -47,9 +51,9 @@ Item{
     }
 
     Label {
-        id: enterYourResultsLabel
+        id: yourResultsLabel
 
-        text:qsTr("Enter your own results")
+        text:qsTr("Use your own results")
         anchors.verticalCenterOffset: parent.height/-4
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: switchPanel.right
@@ -58,7 +62,7 @@ Item{
     Label {
         id: forYouLabel
 
-        text:qsTr("Roll the above values for you")
+        text:qsTr("Roll for you")
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: parent.height/4
         anchors.left: switchPanel.right

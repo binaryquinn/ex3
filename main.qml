@@ -6,16 +6,15 @@ import QtQuick.Layouts 1.1
 
 Window
 {
-    id: window1
+    id: window1    
     title: qsTr("Exalted 3rd Edition Combat Tracker")
     width: 1000
     height: 480
     visible: true
 
-
     ColumnLayout {
         id: columnLayout1
-        width: parent.width/7
+        width: parent.width/6
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10
         anchors.top: parent.top
@@ -156,7 +155,9 @@ Window
                 attacker:model
                 number: index
                 width: parent.width - 10
+                onActionResults: {
 
+                }
             }
         }
     }
