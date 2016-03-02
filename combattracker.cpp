@@ -3,7 +3,6 @@
 #include <QDebug>
 #include "combatant.h"
 
-
 CombatTracker::CombatTracker(QObject *parent) : QObject(parent)
 {
     battleStarted = false;
@@ -52,92 +51,99 @@ void CombatTracker::addCombatant(Combatant *add, bool iniGiven)
         emit nextRoundChanged();
     }
 }
-void CombatTracker::attack(int attackerIndex, int attackingWeapon, int defenderIndex, int defendingWeapon, int attackType, int defenseType)
-{
-    Combatant *attacker = myCurrentRound[attackerIndex];
-    Combatant *defender = myTargets[defenderIndex];
-
-    QList<Combatant *> *host = myCurrentRound.contains(defender)? &myCurrentRound : &myNextRound;
-
-    Weapon *aWeapon = attacker->weapon(attackingWeapon);
-    Weapon *dWeapon = defender->weapon(defendingWeapon);
-    int attackResult = D10::roll(std::max(attacker->attack((CombatConstants::Attack)attackType, aWeapon),0)) - defender->defense((CombatConstants::Defense)defenseType, dWeapon);
-    if(attackResult > 0)
-    {
-        int damagePool = attacker->damage((CombatConstants::Attack)attackType, aWeapon) + ((CombatConstants::Attack)attackType == CombatConstants::Withering)? attackResult : 0;
-        int damageResult = defender->takeDamage((CombatConstants::Attack)attackType,damagePool,aWeapon->overwhelming(),aWeapon->woundType());
-        if((CombatConstants::Attack)attackType == CombatConstants::Withering)
-        {
-            attacker->changeInitiative(1+damageResult);
-        }
-        else
-            attacker->resetInitiative();
-    }
-    else
-    {
-        if((CombatConstants::Attack)attackType == CombatConstants::Decisive)
-        {
-            int iniTemp = attacker->initiative();
-            if(attacker->initiative() < 11)
-                attacker->changeInitiative(-2);
-            else
-                attacker->changeInitiative(-3);
-            if(iniTemp > 0 && attacker->initiative() < 1)
-            {
-                attacker->changeInitiative(-5);
-            }
-        }
-    }
-
-
-    binaryInsertion(&myNextRound,attacker, 0,myNextRound.count());
-    myCurrentRound.removeAt(attackerIndex);
-
-
-    host->removeOne(defender);
-
-    if(!(defender->isDead()||defender->isIncapacitated()))
-        binaryInsertion(host, defender,0, host->count());
-
-
-    if(myCurrentRound.count() < 1)
-    {
-        myCurrentRound.swap(myNextRound);
-    }
-    myCurrentRound.first()->refreshTurn();
-    emit currentRoundChanged();
-    emit nextRoundChanged();
-}
 
 int CombatTracker::roll(int dice)
 {
     return D10::roll(dice);
 }
 
-void CombatTracker::modifyCombatant(Combatant* subject, int unit, int amount, bool done)
-{
-    QMultiMap<int, Combatant * > *hostMap = currentRoundMap.contains(subject->initiative(),subject)? &currentRoundMap : &nextRoundMap;
-    int tick = subject->initiative();
-    if(amount != 0)
-    {
 
-        if(unit == 0)
-            subject->changeInitiative(amount);
-        else
-            subject->suffer(std::abs(amount),(CombatConstants::Wounds)unit);
-    }
+void CombatTracker::modifyCombatant(Combatant *subject, QMap<QString, int> deltaMap)
+{
+    QMultiMap<int, Combatant* >* hostMap = currentRoundMap.contains(subject->initiative(),subject)? &currentRoundMap : &nextRoundMap;
+    int tick = subject->initiative();
+
+    if(deltaMap["i"] != 0)
+        subject->changeInitiative(deltaMap["i"]);
+    if(deltaMap["h"] != 0)
+        subject->suffer(std::abs(deltaMap["h"]),(CombatConstants::Wounds)deltaMap["w"]);
 
     hostMap->remove(tick,subject);
-    if(done)
+    if(deltaMap.contains("d"))
     {
         hostMap =  &nextRoundMap;
     }
-
 
     if(!(subject->isDead()||subject->isIncapacitated()))
         hostMap->insertMulti(subject->initiative(), subject);
     else
         myTargets.removeOne(subject);
+}
+
+void CombatTracker::updateActionDeltas(QJsonObject actionJson, QMap<QString,int> &actionMap)
+{
+    int aInitDelta, aDamage, aUnit;
+
+    aInitDelta = actionJson["i"].toInt();
+    aDamage = actionJson["h"].toInt();
+    aUnit = actionJson["w"].toInt();
+    if(!actionMap.isEmpty())
+    {
+        actionMap.insert("i", aInitDelta);
+        actionMap.insert("h", aDamage);
+        actionMap.insert("w", aUnit);
+    }
+    else
+    {
+        actionMap["i"] += aInitDelta;
+        actionMap["h"] += aDamage;
+        actionMap["w"] += aUnit;
+    }
+
+    if(actionJson.contains("d"))
+        actionMap.insert("d", actionJson["d"].toBool());
+
+}
+
+
+void CombatTracker::modifyCombatants(QJsonObject tickActionsList)
+{
+    QMap<Combatant* , QMap<QString, int> > tickActorsMap;
+
+    int dIndex;
+    QJsonObject attackerJSON, defenderJSON;
+    Combatant* attacker, * defender;
+    foreach (QString indexKey, tickActionsList.keys())
+    {
+        attackerJSON = tickActionsList[indexKey].toObject()["attacker"].toObject();
+        attacker = myCurrentRound[attackerJSON["n"].toInt()];
+
+        if(!tickActorsMap.contains(attacker))
+        {
+            tickActorsMap.insert(attacker,  QMap<QString, int>());
+        }
+        updateActionDeltas(attackerJSON, tickActorsMap[attacker]);
+
+        defenderJSON = tickActionsList[indexKey].toObject()["defender"].toObject();
+        if(!defenderJSON.isEmpty())
+        {
+            dIndex = defenderJSON["n"].toInt();
+            defender = (dIndex < myTargets.indexOf(attacker))? myTargets[dIndex] : myTargets[dIndex+1];
+
+            if(!tickActorsMap.contains(defender))
+            {
+                tickActorsMap.insert(defender, QMap<QString, int>());
+            }
+            updateActionDeltas(defenderJSON, tickActorsMap[defender]);
+        }
+    }
+
+    foreach(Combatant* actor, tickActorsMap.keys())
+    {
+        modifyCombatant(actor, tickActorsMap[actor]);
+        if(actor->isDead()||actor->isIncapacitated())
+            actor->deleteLater();
+    }
 
     if(currentRoundMap.values(myCurrentTick).count() < 1)
     {
@@ -155,32 +161,18 @@ void CombatTracker::modifyCombatant(Combatant* subject, int unit, int amount, bo
         }
     }
 
-}
+    if(myTargets.length() < 2)
+    {
+        battleStarted = false;
+        emit inBattleChanged();
+    }
 
-void CombatTracker::modifyCombatants(int attackerIndex, int attackUnit, int attackAmount, bool done, int defenderIndex, int defenderUnit, int defenderAmount)
-{
-    Combatant* attacker = myCurrentRound[attackerIndex];
-    Combatant* defender = (defenderIndex < myTargets.indexOf(attacker))?myTargets[defenderIndex]:myTargets[defenderIndex+1];
-    modifyCombatant(attacker, attackUnit, attackAmount, done);
-    modifyCombatant(defender, defenderUnit, defenderAmount, false);
-
-    if(defender->isDead()||defender->isIncapacitated())
-        defender->deleteLater();
     emit targetsChanged();
     emit currentTicksChanged();
     emit currentRoundChanged();
     emit nextTicksChanged();
     emit nextRoundChanged();
-}
 
-void CombatTracker::modifyCombatants(QJsonObject tickActionsList)
-{
-   //QMap<int,QVariantMap> actorMap;
-
-
-            foreach (QString indexKey, tickActionsList.keys()) {
-                qDebug() << tickActionsList[indexKey];
-            }
 }
 
 int CombatTracker::dicePool(int actorIndex, int actionIndex, int actionList, int poolType, int weaponIndex)
@@ -216,7 +208,7 @@ QQmlListProperty<Combatant> CombatTracker::nextRound()
     {
         myNextRound = nextRoundMap.values();
     }
-    return QQmlListProperty<Combatant>(this,myNextRound);
+    return QQmlListProperty<Combatant>(this, myNextRound);
 }
 
 

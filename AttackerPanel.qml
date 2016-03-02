@@ -139,7 +139,7 @@ Rectangle{
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.margins: 5
-                visible: doWhatCombo.currentIndex > -1 && toWhomCombo.currentIndex > -1 && action.difficulty ==="defense"
+                visible: doWhatCombo.currentIndex > -1 && toWhomCombo.currentIndex > -1 && action.difficulty && action.difficulty ==="defense"
                 model: (!!defender)? defender.defenseList:0
                 style:ComboBoxStyle {
                     label:Label {
@@ -224,9 +224,9 @@ Rectangle{
             var results;
             if(checked)
             {
-                results = [{action:doWhatCombo.currentIndex},
-                           {attacker:[{n:number}, {d:doneCheck.checked},{i : proactiveInput.initiativeDamage}, {h : proactiveInput.healthDamage}, {w : proactiveInput.woundUnit}]},
-                           {defender:[{n:toWhomCombo.currentIndex}, {i : reactiveInput.initiativeDamage}, {h : reactiveInput.healthDamage}, {w : reactiveInput.woundUnit}]}]
+                results = {action:doWhatCombo.currentIndex,
+                           attacker:{n : number, d:doneCheck.checked,i : proactiveInput.initiativeDamage, h : proactiveInput.healthDamage, w : proactiveInput.woundUnit},
+                           defender:(defender)?{n:toWhomCombo.currentIndex, i : reactiveInput.initiativeDamage, h : reactiveInput.healthDamage, w : reactiveInput.woundUnit}:undefined}
             }
             else {
                 results = -1

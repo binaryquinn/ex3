@@ -14,6 +14,7 @@ Window
 
     property var roundActionsList
     property int counter
+
     ColumnLayout {
         id: columnLayout1
         width: parent.width/6
@@ -64,42 +65,46 @@ Window
             }
         }
 
-   Item{
-        id:buttonPanel
-        anchors.centerIn: parent
-        width:currentRoundGroup.width
-        Component.onCompleted: height =childrenRect.height
-        Button {
-            id: addCombatantButton
-            text: qsTr("Add Combatant")
+        Item{
+            id:buttonPanel
+            anchors.centerIn: parent
+            width:currentRoundGroup.width
+            Component.onCompleted: height =childrenRect.height
+            Button {
+                id: addCombatantButton
+                text: qsTr("Add Combatant")
 
-            anchors.bottom: parent.verticalCenter
-            anchors.margins: 5
-            anchors.left: parent.left
-            onClicked: messageDialog.open()
+                anchors.bottom: parent.verticalCenter
+                anchors.margins: 5
+                anchors.left: parent.left
+                onClicked: messageDialog.open()
+            }
+            Button {
+                id: commitButton
+                text: qsTr("Commit")
+                anchors.top: addCombatantButton.top
+                anchors.bottom: combatControlButton.bottom
+                anchors.left: addCombatantButton.right
+                anchors.leftMargin: 10
+                anchors.right: parent.right
+                enabled: combatControlButton.enabled && Tracker.inBattle && counter === Tracker.currentRound.length
+                onClicked: {
+                    Tracker.modifyCombatants(roundActionsList);
+                    roundActionsList = {};
+                    counter = 0;
+                }
+            }
+            Button {
+                id: combatControlButton
+                text: Tracker.inBattle?qsTr("Stop Combat") : qsTr("Start Combat");
+                anchors.top: parent.verticalCenter
+                anchors.margins: 5
+                anchors.left: parent.left
+                anchors.right: commitButton.left
+                enabled: ( Tracker.currentRound.length +  Tracker.nextRound.length) > 1 || Tracker.currentTicks.length > 1
+                onClicked: Tracker.inBattle = !Tracker.inBattle
+            }
         }
-        Button {
-            id: commitButton
-            text: qsTr("Commit")
-            anchors.top: addCombatantButton.top
-            anchors.bottom: combatControlButton.bottom
-            anchors.left: addCombatantButton.right
-            anchors.leftMargin: 10
-            anchors.right: parent.right
-            enabled: combatControlButton.enabled && Tracker.inBattle && counter === Tracker.currentRound.length
-            onClicked: Tracker.modifyCombatants(roundActionsList)
-        }
-        Button {
-            id: combatControlButton
-            text: Tracker.inBattle?qsTr("Stop Combat") : qsTr("Start Combat");
-            anchors.top: parent.verticalCenter
-            anchors.margins: 5
-            anchors.left: parent.left
-            anchors.right: commitButton.left
-            enabled: (Tracker.currentTicks.length > 1 || Tracker.currentRound.length > 1)
-            onClicked: Tracker.inBattle = !Tracker.inBattle
-        }
-   }
         GroupBox {
             id: nextRoundGroup
             anchors.right: parent.right
@@ -173,10 +178,10 @@ Window
                     }
                 }
             }
-        onModelChanged: {
-            roundActionsList = {};
-            counter = 0;
-        }
+            onModelChanged: {
+                roundActionsList = {};
+                counter = 0;
+            }
         }
     }
     AddCombatantDialog

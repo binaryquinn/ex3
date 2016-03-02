@@ -107,7 +107,6 @@ private:
     QList<Combatant*> temp;
     static QList<CombatAction *> masterActionList;
     static QList<CombatAction *> crashedActionList;
-
 };
 
 #endif // COMBATANT_H

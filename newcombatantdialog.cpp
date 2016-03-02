@@ -79,7 +79,7 @@ void NewCombatantDialog::makeCombatant(QString name, QVariant ini, int soak, int
     int dex = myAttributes[1]->property("stat").toInt();
     int sta = myAttributes[2]->property("stat").toInt();
     int wit = myAttributes[3]->property("stat").toInt();
-    Combatant * newbie = new Combatant(name,dex,str,sta,wit);
+    Combatant * newbie = new Combatant(name, dex, str, sta, wit);
     newbie->setArmor(soak,hardness,penalty);
 
     foreach (TraitRating* trait, myAbilities)

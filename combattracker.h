@@ -15,16 +15,14 @@ class CombatTracker : public QObject
     Q_OBJECT
     Q_PROPERTY(QQmlListProperty<Combatant> currentRound READ currentRound NOTIFY currentRoundChanged)
     Q_PROPERTY(QQmlListProperty<Combatant> nextRound READ nextRound NOTIFY nextRoundChanged)
-     Q_PROPERTY(bool inBattle MEMBER battleStarted NOTIFY inBattleChanged)
+    Q_PROPERTY(bool inBattle MEMBER battleStarted NOTIFY inBattleChanged)
     Q_PROPERTY(QVariantList currentTicks READ currentTicks NOTIFY currentTicksChanged)
     Q_PROPERTY(QVariantList nextTicks READ nextTicks NOTIFY nextTicksChanged)
 public:
     explicit CombatTracker(QObject *parent = 0);
     ~CombatTracker();
 
-    Q_INVOKABLE void attack(int attackerIndex, int aWeapon, int defenderIndex, int dWeapon, int attackType, int defenseType = CombatConstants::Overall);
 
-    Q_INVOKABLE void modifyCombatants(int attacker, int attackUnit, int attackAmount, bool done, int defender, int defenderUnit, int defenderAmount);
     Q_INVOKABLE void modifyCombatants(QJsonObject tickActionsList);
     Q_INVOKABLE int dicePool(int actorIndex, int actionIndex, int actionList, int poolType, int weaponIndex);
     Q_INVOKABLE QString dicePoolString(int attackerIndex, int actionIndex, int actionList, int poolType, int weaponIndex);
@@ -57,13 +55,13 @@ private:
     QList<Combatant *> myNextRound;
     int myCurrentTick;
     bool battleStarted;
-    void binaryInsertion(QList<Combatant *> *host, Combatant* add, int left, int right);
     QList<Combatant *> myTargets;
-    bool targetHurt;
     QMultiMap<int, Combatant *> currentRoundMap;
     QMultiMap<int, Combatant *> nextRoundMap;
-    void modifyCombatant(Combatant* subject , int unit, int amount, bool done);
 
+    void binaryInsertion(QList<Combatant *> *host, Combatant* add, int left, int right);
+    void modifyCombatant(Combatant *subject, QMap<QString, int> deltaMap);
+    void updateActionDeltas(QJsonObject actionJson, QMap<QString, int> &actionMap);
 };
 
 #endif // COMBATTRACKER_H
