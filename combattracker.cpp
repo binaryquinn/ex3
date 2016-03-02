@@ -242,22 +242,3 @@ bool CombatTracker::inBattle()
 {
     return battleStarted;
 }
-
-void CombatTracker::binaryInsertion(QList<Combatant *> *host, Combatant* add, int left, int right)
-{
-    int mid = (left+right)/2;
-    if (right <= left )
-    {
-        if( mid + 1 < host->count() && add->initiative() < host->at(mid)->initiative())
-            host->insert(mid+1,add);
-        else
-            host->insert(mid,add);
-    }
-    else
-    {
-        if (add->initiative() < host->at(mid)->initiative())
-            binaryInsertion(host, add, ++mid, right);
-        else
-            binaryInsertion(host, add, left, --mid);
-    }
-}

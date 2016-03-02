@@ -59,7 +59,6 @@ private:
     QMultiMap<int, Combatant *> currentRoundMap;
     QMultiMap<int, Combatant *> nextRoundMap;
 
-    void binaryInsertion(QList<Combatant *> *host, Combatant* add, int left, int right);
     void modifyCombatant(Combatant *subject, QMap<QString, int> deltaMap);
     void updateActionDeltas(QJsonObject actionJson, QMap<QString, int> &actionMap);
 };
